@@ -37,7 +37,8 @@ Modify the yaml file for your deployment, by doing the following:
 - To restrict access to your EKS cluster, replace PUT_YOUR_YOUR_PUBLIC_IP_HERE with your computer's public IP address.
 - Change the references to the AWS region and availability zones. Change us-west-1, us-west-1a and us-west-1b as needed. 
 - Add a reference to your private SSH key, 
-- If you want to be able to SSH into the EC2 instances, replace both occurrences PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE with the path to your public ssh key. 
+- If you want to be able to SSH into the EC2 instances, replace both occurrences PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE with the path to your public ssh key. If you don't have an SSH key pair, you can generate one with the command:
+     - $ ssh-keygen -t rsa -N '' -f ./eks_ssh_key <<< y
 - Change the number of nodes in your EKS cluster to support the workloads you are running. For Alluxio, you will require a minimum of 3 master nodes and 3 worker nodes. Change PUT_YOUR_MAX_WORKER_COUNT_HERE to the maximum number of worker nodes and change PUT_YOUR_DESIRED_WORKER_COUNT_HERE to your desired number of worker nodes.
 - Change the EC2 instance types for the master nodes and worker nodes. Make sure you choose instance types that have enough cpu vcores, memory and NVMe storage to support running both Spark pods and Alluxio pods and that allow Alluxio to cache enough data on NVMe storage to improve performance. Alluxio requirements and tuning best practives can be found here:
      - https://docs.alluxio.io/os/user/stable/en/deploy/Requirements.html

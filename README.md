@@ -20,7 +20,23 @@ For more information on running Spark on EKS, see: https://aws.amazon.com/blogs/
 
 ## PREREQUISITES
 
-TBD
+To use the commands outlined in the repo, you will need the following:
+
+- The git CLI installed - See: https://github.com/git-guides/install-git
+- The AWS CLI installed - See: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+- The AWS EKS CLI installed - See: https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html
+- The Kubernetes CLI - See: https://kubernetes.io/docs/tasks/tools/#kubectl
+- Your AWS credentials defined defined in the `~/.aws/credentials`, like this:
+
+     - [default]
+     - aws_access_key_id=[AWS ACCESS KEY]
+     - aws_secret_access_key=[AWS SECRET KEY]
+
+- You also need IAM role membership and permissions to create the following objects:
+     - AWS S3 Buckets (or already have one available)
+     - EKS clusters (and the various resources that get created)
+     - CloudFormation stacks
+     - EC2 instance types as specfied in the eks/eks-cluster.yaml file
 
 ## USAGE
 

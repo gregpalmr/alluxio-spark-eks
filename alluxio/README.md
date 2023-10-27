@@ -66,7 +66,7 @@ Modify the yaml file for your Alluxio deployment, by doing the following:
      - Alluxio worker node pods:
           -  8 CPU cores
           - 32 GB of Java Heap and 10 GB of direct memory 
-          -  2 600 GB (unformatted) NVMe persistent volumes for cache storage (see: "quota: 550GB,550GB")
+          -  2 600 GB (unformatted) NVMe persistent volumes for cache storage (see: "quota: 547GB,547GB")
 - If you don't want to install Alluxio on all the EKS nodes, you can define a toleration that will cause Alluxio pods not to get scheduled on specific nodes. Change PUT_YOUR_TOLERATION_KEY_HERE and PUT_YOUR_TOLERATION_VALUE_HERE, and uncomment that section.
 
 Use your favorite editor to modify the Alluxio-helm-values.yaml file:

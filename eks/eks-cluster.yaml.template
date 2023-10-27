@@ -22,8 +22,10 @@ iam:
     roleName: eksctl-cluster-autoscaler-role
 managedNodeGroups:
   - name: master
-    labels: { fast-disk-node: "pv-nvme" }
-    instanceType: m5d.4xlarge
+    labels:
+      fast-disk-node: "pv-nvme"
+      alluxio-node-type: "master"
+    instanceType: m5d.4xlarge # 16 vcores, 64 GB MEM, 2 x 300 NVMe SSD, Up to 10GbE Network
     availabilityZones: ["us-west-1a"]
     volumeSize: 100
     volumeType: gp3
@@ -45,6 +47,7 @@ managedNodeGroups:
         nvme_drives=$(nvme list | grep "Amazon EC2 NVMe Instance Storage" | cut -d " " -f 1 || true)
         readarray -t nvme_drives <<< "$nvme_drives"
 
+        disk_num=0
         for disk in "${nvme_drives[@]}"
         do
           # Format the disk to ext4
@@ -54,7 +57,7 @@ managedNodeGroups:
           uuid=$(blkid -o value -s UUID $disk)
 
           # Create a filesystem path to mount the disk
-          mount_location="/mnt/fast-disks/${uuid}"
+          mount_location="/mnt/fast-disks/disk${disk_num}"
           mkdir -p $mount_location
 
           # Mount the disk
@@ -62,11 +65,13 @@ managedNodeGroups:
 
           # Mount the disk during a reboot
           echo $disk $mount_location ext4 defaults,noatime 0 2 >> /etc/fstab
+          ((disk_num++))
         done
-managedNodeGroups:
   - name: worker
-    labels: { fast-disk-node: "pv-nvme" }
-    instanceType: m5d.4xlarge
+    labels:
+      fast-disk-node: "pv-nvme"
+      alluxio-node-type: "worker"
+    instanceType: m5d.8xlarge # 32 vcores, 128 GB MEM, 2 x 600 NVMe SSD, 10GbE Network
     availabilityZones: ["us-west-1a"]
     volumeSize: 100
     volumeType: gp3
@@ -88,6 +93,7 @@ managedNodeGroups:
         nvme_drives=$(nvme list | grep "Amazon EC2 NVMe Instance Storage" | cut -d " " -f 1 || true)
         readarray -t nvme_drives <<< "$nvme_drives"
 
+        disk_num=0
         for disk in "${nvme_drives[@]}"
         do
           # Format the disk to ext4
@@ -97,7 +103,7 @@ managedNodeGroups:
           uuid=$(blkid -o value -s UUID $disk)
 
           # Create a filesystem path to mount the disk
-          mount_location="/mnt/fast-disks/${uuid}"
+          mount_location="/mnt/fast-disks/disk${disk_num}"
           mkdir -p $mount_location
 
           # Mount the disk
@@ -105,6 +111,7 @@ managedNodeGroups:
 
           # Mount the disk during a reboot
           echo $disk $mount_location ext4 defaults,noatime 0 2 >> /etc/fstab
+          ((disk_num++))
         done
 addons:
   - name: vpc-cni

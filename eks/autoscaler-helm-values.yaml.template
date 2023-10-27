@@ -1,0 +1,11 @@
+---
+autoDiscovery:
+    clusterName: emr-spark-alluxio-cluster
+    tags:
+      - k8s.io/cluster-autoscaler/enabled
+      - k8s.io/cluster-autoscaler/{{ .Values.autoDiscovery.clusterName }}
+awsRegion: us-west-1 # Make sure the region same as the EKS Cluster
+rbac:
+  serviceAccount:
+    create: false
+    name: cluster-autoscaler

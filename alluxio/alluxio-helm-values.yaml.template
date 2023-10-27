@@ -116,8 +116,7 @@ tieredstore:
     path: /mnt/fast-disks/disk0,/mnt/fast-disks/disk1
     type: persistentVolumeClaim
     name: alluxio-nvme0,alluxio-nvme1
-    #quota: 550GB,550GB
-    quota: 270GB,270GB
+    quota: 548GB,548GB
     high: 0.95
     low: 0.7
 
@@ -199,7 +198,7 @@ journal:
   ufsType: "local"
   folder: "/journal"
   volumeType: persistentVolumeClaim
-  size: 270
+  size: 270Gi
   storageClass: "fast-disks"
   accessModes:
     - ReadWriteOnce
@@ -289,6 +288,6 @@ logserver:
   hostPath: "/tmp/alluxio-logs" # The hostPath directory to use
   # Attributes to use when the log volume is emptyDir
   medium: ""
-  size: 1000Gi
+  size: 100Gi
 
 

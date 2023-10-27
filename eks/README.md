@@ -18,10 +18,6 @@ For more information on Alluxio, see: https://www.alluxio.io/
 
 For more information on running Spark on EKS, see: https://aws.amazon.com/blogs/big-data/introducing-amazon-emr-on-eks-job-submission-with-spark-operator-and-spark-submit/
 
-## PREREQUISITES
-
-TBD
-
 ## USAGE (con't)
 
 ## Step 2. Deploy an EKS cluster
@@ -38,10 +34,10 @@ Make a working copy of the eks-cluster.yaml file:
 
 Modify the yaml file for your deployment, by doing the following:
 
-- To restrict access to your EKS cluster, replace PUT_YOUR_YOUR_PUBLIC_IP_HERE/32 with your computer's public IP address.
+- To restrict access to your EKS cluster, replace PUT_YOUR_YOUR_PUBLIC_IP_HERE with your computer's public IP address.
 - Change the references to the AWS region and availability zones. Change us-west-1, us-west-1a and us-west-1b as needed. 
 - Add a reference to your private SSH key, 
-- If you want to be able to SSH into the EC2 instances, replace PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE with the path to your public ssh key. 
+- If you want to be able to SSH into the EC2 instances, replace both occurrences PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE with the path to your public ssh key. 
 - Change the number of nodes in your EKS cluster to support the workloads you are running. For Alluxio, you will require a minimum of 3 master nodes and 3 worker nodes. Change PUT_YOUR_MAX_WORKER_COUNT_HERE to the maximum number of worker nodes and change PUT_YOUR_DESIRED_WORKER_COUNT_HERE to your desired number of worker nodes.
 - Change the EC2 instance types for the master nodes and worker nodes. Make sure you choose instance types that have enough cpu vcores, memory and NVMe storage to support running both Spark pods and Alluxio pods and that allow Alluxio to cache enough data on NVMe storage to improve performance. Alluxio requirements and tuning best practives can be found here:
      - https://docs.alluxio.io/os/user/stable/en/deploy/Requirements.html
@@ -57,16 +53,32 @@ Use your favorite editor to modify the yaml file:
 Use the eksctl command line tool to launch the EKS cluster:
 
      $ eksctl create cluster -f eks/eks-cluster.yaml
+        2023-10-27 12:16:56 [ℹ]  creating addon
+        2023-10-27 12:17:50 [ℹ]  addon "kube-proxy" active
+        2023-10-27 12:17:52 [ℹ]  kubectl command should work with "/Users/greg/.kube/config", try 'kubectl get nodes'
+        2023-10-27 12:17:52 [✔]  EKS cluster "emr-spark-alluxio" in "us-west-1" region is ready
 
 After the eksctl tool reports that the cluster was created, you can display the EKS nodes and other cluster information using the commands:
 
      $ eksctl get clusters --region=us-west-1
+        NAME			REGION		EKSCTL CREATED
+        emr-spark-alluxio	us-west-1	True
 
      $ eksctl get nodegroups --region=us-west-1 --cluster=emr-spark-alluxio
+        CLUSTER			NODEGROUP	STATUS	CREATED			MIN SIZE	MAX SIZE	DESIRED CAPACITY	INSTANCE TYPE	IMAGE ID	ASG NAME					TYPE
+        emr-spark-alluxio	master		ACTIVE	2023-10-27T16:13:42Z	3		3		3			m5d.4xlarge	AL2_x86_64	eks-master-1ec5b8f4-d323-5829-a3ed-a47424e3ad70	managed
+        emr-spark-alluxio	worker		ACTIVE	2023-10-27T16:13:38Z	3		3		3			m5d.4xlarge	AL2_x86_64	eks-worker-08c5b8f4-cba5-5b99-ae13-0d53ac57839c	managed
 
      $ kubectl get nodes -o wide
+        NAME                                           STATUS   ROLES    AGE   VERSION                INTERNAL-IP      EXTERNAL-IP      OS-IMAGE         KERNEL-VERSION                  CONTAINER-RUNTIME
+        ip-192-168-0-54.us-west-1.compute.internal     Ready    <none>   13m   v1.25.13-eks-43840fb   192.168.0.54     13.52.182.115    Amazon Linux 2   5.10.192-183.736.amzn2.x86_64   containerd://1.6.19
+        ip-192-168-1-177.us-west-1.compute.internal    Ready    <none>   14m   v1.25.13-eks-43840fb   192.168.1.177    54.183.71.208    Amazon Linux 2   5.10.192-183.736.amzn2.x86_64   containerd://1.6.19
+        ip-192-168-19-221.us-west-1.compute.internal   Ready    <none>   14m   v1.25.13-eks-43840fb   192.168.19.221   54.241.86.29     Amazon Linux 2   5.10.192-183.736.amzn2.x86_64   containerd://1.6.19
+        ip-192-168-24-236.us-west-1.compute.internal   Ready    <none>   13m   v1.25.13-eks-43840fb   192.168.24.236   13.52.102.101    Amazon Linux 2   5.10.192-183.736.amzn2.x86_64   containerd://1.6.19
+        ip-192-168-27-14.us-west-1.compute.internal    Ready    <none>   14m   v1.25.13-eks-43840fb   192.168.27.14    3.101.144.207    Amazon Linux 2   5.10.192-183.736.amzn2.x86_64   containerd://1.6.19
+        ip-192-168-4-241.us-west-1.compute.internal    Ready    <none>   13m   v1.25.13-eks-43840fb   192.168.4.241    54.183.161.177   Amazon Linux 2   5.10.192-183.736.amzn2.x86_64   containerd://1.6.19
 
-     $ kubectl describe node ip-192-168-12-142.us-west-1.compute.internal
+     $ kubectl describe node ip-192-168-0-54.us-west-1.compute.internal
 
 ### c. Setup a Service Account
 
@@ -92,9 +104,9 @@ Run the following command to create the ServiceAccount, ClusterRole, and Cluster
 
 ### d. Configure the CSI Driver ConfigMap
 
-The Local Volume Static Provisioner CSI driver uses a Kubernetes ConfigMap to know where to look for mounted EC2 NVMe instance store volumes and how to expose them as PVs. Use a ConfigMap yaml file that specifies where the Local Volume Static Provisioner should look for mounted NVMe instance store volumes in the /mnt/fast-disk directory.
+The Local Volume Static Provisioner CSI driver uses a Kubernetes ConfigMap to specify where to look for mounted EC2 NVMe instance store volumes and how to expose them as PVs. It will search for mounted NVMe instance store volumes in the /mnt/fast-disk directory.
 
-Kubernetes StorageClass specifies a type of storage available in the cluster. The manifest includes a new StorageClass of fast-disks to identify that the PVs relate to NVMe instance store volumes.
+Kubernetes StorageClass specifies a type of storage available in the cluster. The config map manifest file includes a StorageClass of fast-disks to identify that the PVs relate to NVMe instance store volumes.
 
 Make a working copy of the eks/config-map.yaml file:
 
@@ -135,21 +147,27 @@ Then run the following command to create the StorageClass and ConfigMap.
 To see the daemon set running on each eks node, use the following command:
 
      $ kubectl get daemonset --namespace=kube-system
-       NAME                       DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
-       aws-node                   3         3         3       3            3           <none>          102m
-       kube-proxy                 3         3         3       3            3           <none>          102m
-       local-volume-provisioner   3         3         3       3            3           <none>          30s
+        NAME                       DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+        aws-node                   6         6         6       6            6           <none>          30m
+        kube-proxy                 6         6         6       6            6           <none>          30m
+        local-volume-provisioner   6         6         6       6            6           <none>          23s
 
 To see the persistent volumes that were created by the daemon set, use the following command:
 
     $ kubectl get pv
-      NAME                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE
-      local-pv-44b6b86e   274Gi      RWO            Retain           Available           fast-disks              2m16s
-      local-pv-4c0706b3   274Gi      RWO            Retain           Available           fast-disks              2m16s
-      local-pv-505a86f    274Gi      RWO            Retain           Available           fast-disks              2m16s
-      local-pv-620113e1   274Gi      RWO            Retain           Available           fast-disks              2m16s
-      local-pv-7eda114c   274Gi      RWO            Retain           Available           fast-disks              2m16s
-      local-pv-bba1b1da   274Gi      RWO            Retain           Available           fast-disks              2m16s
+        NAME                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE
+        local-pv-36415ad3   274Gi      RWO            Retain           Available           fast-disks              72s
+        local-pv-53231c7c   274Gi      RWO            Retain           Available           fast-disks              72s
+        local-pv-88696f3e   274Gi      RWO            Retain           Available           fast-disks              72s
+        local-pv-94a5a4e4   274Gi      RWO            Retain           Available           fast-disks              72s
+        local-pv-ad10a265   274Gi      RWO            Retain           Available           fast-disks              72s
+        local-pv-adffed3e   274Gi      RWO            Retain           Available           fast-disks              71s
+        local-pv-b359f3ff   274Gi      RWO            Retain           Available           fast-disks              72s
+        local-pv-d68ae837   274Gi      RWO            Retain           Available           fast-disks              72s
+        local-pv-d762717c   274Gi      RWO            Retain           Available           fast-disks              72s
+        local-pv-dce20ffc   274Gi      RWO            Retain           Available           fast-disks              72s
+        local-pv-f654a97c   274Gi      RWO            Retain           Available           fast-disks              71s
+        local-pv-ffc1b84c   274Gi      RWO            Retain           Available           fast-disks              72s
 
 ### f. (Optional) Install the Kubernetes Autoscaler
 
@@ -171,12 +189,19 @@ Use your favorite editor to modify the autoscaler-helm-values.yaml file:
 Then, enable the autoscaler help chart to be used to deploy the autoscaler:
 
      $ helm repo add autoscaler https://kubernetes.github.io/autoscaler
+        "autoscaler" has been added to your repositories
 
 Finally, deploy the autoscaler using the helm chart:
 
      $ helm install nodescaler autoscaler/cluster-autoscaler \
           --namespace kube-system \
-          --values autoscaler-helm-values.yaml --debug
+          --values eks/autoscaler-helm-values.yaml --debug
+
+Verify that cluster-autoscaler has started, run the command:
+
+     $ kubectl --namespace=kube-system get pods -l "app.kubernetes.io/name=aws-cluster-autoscaler,app.kubernetes.io/instance=nodescaler"
+        NAME                                                 READY   STATUS    RESTARTS   AGE
+        nodescaler-aws-cluster-autoscaler-7f85d89688-x9lm2   1/1     Running   0          29s
 
 ---
 

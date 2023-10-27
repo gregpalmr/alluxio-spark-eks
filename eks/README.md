@@ -206,7 +206,7 @@ Verify that cluster-autoscaler has started, run the command:
 
 ### Continue with the next step:
 
-[Deploy Alluxio on the EKS Cluster](alluxio/README.md)
+[Deploy Alluxio on the EKS Cluster](../alluxio/README.md)
 
 ---
 

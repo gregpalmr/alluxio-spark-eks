@@ -204,6 +204,10 @@ Verify that cluster-autoscaler has started, run the command:
         NAME                                                 READY   STATUS    RESTARTS   AGE
         nodescaler-aws-cluster-autoscaler-7f85d89688-x9lm2   1/1     Running   0          29s
 
+### Continue with the next step:
+
+[Deploy Alluxio on the EKS Cluster](alluxio/README.md)
+
 ---
 
 Please direct questions or comments to greg.palme@alluxio.com

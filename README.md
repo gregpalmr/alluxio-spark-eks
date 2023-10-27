@@ -24,7 +24,7 @@ To use the commands outlined in the repo, you will need the following:
 
 - The git CLI installed - See: https://github.com/git-guides/install-git
 - The AWS CLI installed - See: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
-- The AWS EKS CLI installed - See: https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html
+- The AWS EKS CLI installed - See: https://eksctl.io/installation/
 - The Kubernetes CLI - See: https://kubernetes.io/docs/tasks/tools/#kubectl
 - Your AWS credentials defined defined in the `~/.aws/credentials`, like this:
 

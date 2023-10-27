@@ -24,7 +24,7 @@ For more information on running Spark on EKS, see: https://aws.amazon.com/blogs/
 
 ### a. Enable the Alluxio Helm chart
 
-Remove any older Alluxio Helm chart repos:
+Use the helm repo commands to remove any older Alluxio Helm chart repos:
 
      $ helm repo list
      NAME              URL
@@ -32,7 +32,8 @@ Remove any older Alluxio Helm chart repos:
 
      $ helm repo rm alluxio-charts
      "alluxio-charts" has been removed from your repositories
-Use the helm command to add the Alluxio Helm chart to the current repo list:
+
+Use the helm repo command to add the Alluxio Helm chart to the current repo list:
 
      $ helm repo add alluxio-charts https://alluxio-charts.storage.googleapis.com/openSource/2.9.3
      "alluxio-charts" has been added to your repositories
@@ -50,9 +51,9 @@ Make a working copy of the alluxio-helm-values.yaml file:
 
 Modify the yaml file for your Alluxio deployment, by doing the following:
 
-- (Optional) If you are using the Enterprise Edition of Alluxio, replace "PUT_YOUR_LICENSE_BASE64_VALUE_HERE" with your BASE64 version of the license key and uncomment the line that begins with "#license:". Use the following command to get the BASE64 version of your license key:
-     $ cat /path/to/license.json | base64 |  tr -d "\n"
-- Alluxio requires a root under file system (UFS) and you can add other UFSs later. Replace "PUT_YOUR_S3_BUCKET_NAME_HERE" with the name of an S3 bucket that Alluxio can use as the root UFS. If you do not have instance IAM roles configured, you can specify the accessKeyId and secretKey by changing PUT_YOUR_AWS_ACCESS_KEY_ID_HERE and PUT_YOUR_AWS_SECRET_KEY_HERE. If you do have instance roles configured, keep those commented out.
+- (Optional) If you are using the Enterprise Edition of Alluxio, replace PUT_YOUR_LICENSE_BASE64_VALUE_HERE with your BASE64 version of the license key and uncomment the line that begins with "#license:". Use the following command to get the BASE64 version of your license key:
+     - $ cat /path/to/license.json | base64 |  tr -d "\n"
+- Alluxio requires a root under file system (UFS) but you can add other UFSs later. Replace PUT_YOUR_S3_BUCKET_NAME_HERE with the name of an S3 bucket that Alluxio can use as the root UFS. If you do not have instance IAM roles configured, you can specify the accessKeyId and secretKey by changing PUT_YOUR_AWS_ACCESS_KEY_ID_HERE and PUT_YOUR_AWS_SECRET_KEY_HERE. If you do have instance roles configured, keep those commented out.
 - Change the jvmOptions values for the master, worker, job_master, and job_worker pods, as needed. Alluxio provides guidence on tuning the Alluxio master node and worker node JVMs here: 
      - https://docs.alluxio.io/os/user/stable/en/administration/Performance-Tuning.html
      - https://docs.alluxio.io/os/user/stable/en/administration/Scalability-Tuning.html
@@ -61,7 +62,7 @@ Modify the yaml file for your Alluxio deployment, by doing the following:
      - Alluxio master node pods:
           -  4 CPU cores
           - 24 GB of Java Heap and 10 GB of direct memory 
-          -  2 300 GB NVMe (unformatted) persistent volumes for cache storage (see: "quota: 300GB,300GB")
+          -  2 300 GB (unformatted) NVMe persistent volumes for cache storage (see: "quota: 270GB,270GB")
      - Alluxio worker node pods:
           -  8 CPU cores
           - 32 GB of Java Heap and 10 GB of direct memory 

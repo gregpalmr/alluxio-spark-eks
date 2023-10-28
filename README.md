@@ -26,6 +26,7 @@ To use the commands outlined in the repo, you will need the following:
 - The AWS CLI installed - See: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 - The AWS EKS CLI installed - See: https://eksctl.io/installation/
 - The Kubernetes CLI - See: https://kubernetes.io/docs/tasks/tools/#kubectl
+- The helm chart CLI - See: https://helm.sh/docs/intro/install/
 - Your AWS credentials defined defined in the `~/.aws/credentials`, like this:
 
      - [default]

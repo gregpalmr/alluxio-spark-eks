@@ -73,6 +73,82 @@ Use your favorite editor to modify the Alluxio-helm-values.yaml file:
 
      $ vi alluxio/alluxio-helm-values.yaml
 
+### c. Deploy Alluxio pods with the Helm chart
+
+With the helm values yaml file configured for Alluxio master nodes and worker nodes (and persistent storage for each), deploy the Alluxio pods using the Helm chart command. Use the command:
+
+     $ helm install alluxio -f alluxio/alluxio-helm-values.yaml alluxio-charts/alluxio
+
+### d. Verify the Alluxio cluster deployed successfully
+
+If you have an issue deploying the helm chart, you can delete it and try again. Delete it with the command:
+
+     $ helm delete alluxio
+
+Check to see if the Alluxio master and worker pods are running with the command:
+
+     $ kubectl get pods
+     NAME                   READY   STATUS    RESTARTS   AGE
+     alluxio-master-0       2/2     Running   0          70s
+     alluxio-master-1       2/2     Running   0          70s
+     alluxio-master-2       2/2     Running   0          70s
+     alluxio-worker-ktrx7   0/2     Pending   0          70s
+     alluxio-worker-wwp7z   0/2     Pending   0          70s
+     alluxio-worker-x2rkp   0/2     Pending   0          70s
+
+If you see some pods stuck in the Pending status, you can view the log files for the pod to try to understand what might be keeping the pod from successfully running. Use the command:
+
+     $ kubectl describe pod alluxio-worker-x2rkp
+
+The command will display several screens worth of information about the pod. The master pods are made up of two containers, master, and job_master. The worker pods are made up of two containers, worker and job_worker. The last few lines will usually show why a pod is stuck in Pending mode. Here is an example message.
+
+     Events:
+       Type     Reason            Age    From               Message
+       ----     ------            ----   ----               -------
+       Warning  FailedScheduling  3m28s  default-scheduler  0/6 nodes are available: 6 persistentvolumeclaim "alluxio-nvme0" not found. preemption: 0/6 nodes are available: 6 Preemption is not helpful for scheduling.
+
+Based on the message, you may have to tune the configuration of your EKS cluster and the resources available, and retry.
+
+You can also get the log entries for a pod, using the command:
+
+     $ kubectl logs  alluxio-master-0
+     
+Once all the Alluxio master and worker pods are running, you can verify that they have successfully attached the persistent volumes using the commands:
+
+     $ kubectl get pv
+
+     $ kubectl get pvc
+
+### e. Format the Alluxio master node journal
+
+Before using Alluxio, the master nodes must format their journal storage. The master Pods in the StatefulSet use an initContainer to format the journal on startup. The initContainer is switched on by property: journal.format.runFormat=true. By default, the journal is not formatted when the master starts.
+
+Use the following helm upgrade command to format the journals:
+
+     $ helm upgrade alluxio -f alluxio/alluxio-helm-values.yaml --set journal.format.runFormat=true alluxio-charts/alluxio
+
+### f. Run Alluxio CLI commands
+
+You can run Alluxio CLI commands from within the Alluxio master pods. Use the following kubectl command to open a shell session in on e of the Alluxio master pods:
+
+     $ kubectl exec -ti alluxio-master-0 -- /bin/bash
+
+To view the Alluxio properties that were configured for the Alluxio master process, use the command:
+
+     $ ps -ef | grep alluxio
+
+You will see all of the properties that were defined in the Helm chart values.yaml file as -D options to the Java JVM used to run the master process. Like this:
+
+     /usr/lib/jvm/java-1.8.0-openjdk/bin/java -cp /opt/alluxio-2.9.3/conf/::/opt/alluxio-2.9.3/assembly/alluxio-server-2.9.3.jar -Dalluxio.logger.type=Console,MASTER_LOGGER -Dalluxio.master.audit.logger.type=MASTER_AUDIT_LOGGER -Dalluxio.master.journal.type=UFS -Dalluxio.master.journal.folder=/journal -Dalluxio.job.master.job.capacity=200000 -Dalluxio.job.master.network.max.inbound.message.size=100MB -Dalluxio.job.master.worker.timeout=300sec ... -Dalluxio.master.hostname= -Xms24g -Xmx24g -XX:MaxDirectMemorySize=10g -XX:MetaspaceSize=256M alluxio.master.AlluxioMaster
+
+You can run the Alluxio CLI command "alluxio fsadmin report" to see an overview of the Alluxio cluster. Like this:
+
+     $ alluxio fsadmin report
+
+You can test the root under file system (UFS) with the built in test:
+
+     $ alluxio runTests
+
 ---
 
 Please direct questions or comments to greg.palme@alluxio.com

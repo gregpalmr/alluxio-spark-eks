@@ -46,6 +46,9 @@ imagePullSecrets:
 properties:
 
   # Alluxio master node properties
+  alluxio.master.journal.type: EMBEDDED
+  alluxio.master.journal.folder: /journal
+  alluxio.master.embedded.journal.addresses: "alluxio-master-0:19200,alluxio-master-1:19200,alluxio-master-2:19200"
   alluxio.master.metastore: ROCKS
   alluxio.master.metastore.dir: /metastore
   alluxio.master.metadata.sync.concurrency.level: 20
@@ -132,6 +135,7 @@ master:
   #    effect: "NoSchedule"
   resources:
     limits:
+      cpu: "4"
       memory: 36Gi
     requests:
       cpu: "4"
@@ -168,6 +172,7 @@ worker:
   #    effect: "NoSchedule"
   resources:
     limits:      
+      cpu: "8"
       memory: 42Gi
     requests:
       cpu: "8"

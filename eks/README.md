@@ -34,7 +34,8 @@ Make a working copy of the eks-cluster.yaml file:
 
 Modify the yaml file for your deployment, by doing the following:
 
-- To restrict access to your EKS cluster, replace PUT_YOUR_YOUR_PUBLIC_IP_HERE with your computer's public IP address.
+- To restrict access to your EKS cluster, replace PUT_YOUR_YOUR_PUBLIC_IP_HERE with your computer's public IP address. On Linux or MacOS, you can run the following command to get your server's public IP address:
+     - $ curl ifconfig.me
 - Change the references to the AWS region and availability zones. Change us-west-1, us-west-1a and us-west-1b as needed. 
 - Add a reference to your private SSH key, 
 - If you want to be able to SSH into the EC2 instances, replace both occurrences PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE with the path to your public ssh key. If you don't have an SSH key pair, you can generate one with the command:

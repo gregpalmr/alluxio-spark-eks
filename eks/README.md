@@ -140,7 +140,7 @@ Modify the yaml file for your deployment, by doing the following:
 
 Use your favorite editor to modify the yaml file:
 
-     $ vi eks/ccsi-driver-daemon-set.yaml
+     $ vi eks/csi-driver-daemon-set.yaml
 
 Then run the following command to create the StorageClass and ConfigMap.
 

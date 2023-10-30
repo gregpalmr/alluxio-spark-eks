@@ -69,7 +69,7 @@ TBD
 
 To destroy the EKS cluster (and all the Alluxio and Spark pods running on it), use the following command:
 
-     $ eksctl delete cluster -f eks/eks-cluster.yaml
+     $ eksctl delete cluster --region us-west-1 --name=emr-spark-alluxio
 
 CAUTION: All persistent volumes will be release and any data on them will be lost.
 

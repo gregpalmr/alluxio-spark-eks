@@ -79,7 +79,7 @@ To help organize the Kubernetes cluster, create a namespace for your specific en
 
      $ kubectl create namespace alluxio
 
-### c. Create the Alluxio worker persistent volume claims
+### d. Create the Alluxio worker persistent volume claims
 
 Alluxio worker pods use NVMe or SSD persistent storage to cache files from the under file systems (UFSs). This helps improve performance for workloads requesting that data and helps reduce cloud storage egress costs and API costs.
 
@@ -101,13 +101,13 @@ The new PVCs will have a status of Pending until the Alluxio worker pods claim t
 
      $ kubectl get pvc --namespace alluxio
 
-### d. Deploy Alluxio pods with the Helm chart
+### e. Deploy Alluxio pods with the Helm chart
 
 With the helm values yaml file configured for Alluxio master nodes and worker nodes (and persistent storage for each), deploy the Alluxio pods using the Helm chart command. The first time the Alluxio cluster is deployed, you must format the master node journals, so add the --set journal.format.runFormat=true argument to the command. Use the command:
 
      $ helm install alluxio --namespace alluxio --set journal.format.runFormat=true -f alluxio/alluxio-helm-values.yaml alluxio-charts/alluxio
 
-### e. Verify the Alluxio cluster deployed successfully
+### f. Verify the Alluxio cluster deployed successfully
 
 Check to see if the Alluxio master and worker pods are running with the command:
 
@@ -143,7 +143,7 @@ Once all the Alluxio master and worker pods are running, you can verify that the
 
      $ kubectl get pvc --namespace alluxio
 
-### f. Disabel Alluxio master node journal formatting
+### g. Disabel Alluxio master node journal formatting
 
 Since the argument "--set journal.format.runFormat=true" was used to initially deploy the Alluxio cluster, we must upgrade the deployment using the "helm upgrade" command, and specify the "runFormat=false" argument. This way, if a master node gets restarted by the Kubernetes scheduler, it will not format the existing (and still usable) journal on the persistent storage.
 
@@ -151,7 +151,7 @@ Use the following helm upgrade command to not format the journals:
 
      $ helm upgrade alluxio --namespace alluxio --set journal.format.runFormat=false -f alluxio/alluxio-helm-values.yaml alluxio-charts/alluxio
 
-### g. Run Alluxio CLI commands
+### h. Run Alluxio CLI commands
 
 You can run Alluxio CLI commands from within the Alluxio master pods. Use the following kubectl command to open a shell session in on e of the Alluxio master pods:
 
@@ -173,7 +173,7 @@ You can test the root under file system (UFS) with the built in test:
 
      $ alluxio runTests
 
-### h. Destroy the Alluxio cluster
+### i. Destroy the Alluxio cluster
 
 You can destroy the Alluxio master and worker pods and remove the namespace with the commands:
 

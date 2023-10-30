@@ -122,7 +122,7 @@ tieredstore:
     mediumtype: SSD,SSD
     path: /mnt/fast-disks/disk0,/mnt/fast-disks/disk1
     type: persistentVolumeClaim
-    name: alluxio-nvme0,alluxio-nvme1
+    name: alluxio-cache-worker-nvme0,alluxio-cache-worker-nvme1
     quota: 500GB,500GB
     high: 0.95
     low: 0.7
@@ -196,6 +196,19 @@ worker:
     prometheus.io/scrape: "true"
     prometheus.io/port: "30000"
     prometheus.io/path: "/metrics/prometheus/"
+
+shortCircuit:
+  enabled: true
+  policy: uuid
+  size: 1Mi
+  # volumeType controls the type of shortCircuit volume.
+  # It can be "persistentVolumeClaim" or "hostPath"
+  volumeType: persistentVolumeClaim
+  # Attributes to use if the domain socket volume is PVC
+  pvcName: alluxio-worker-domain-socket
+  accessModes:
+    - ReadWriteOnce
+  storageClass: standard
 
 jobWorker:
   properties:

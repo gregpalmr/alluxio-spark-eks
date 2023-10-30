@@ -75,9 +75,9 @@ Use your favorite editor to modify the Alluxio-helm-values.yaml file:
 
 ### c. Deploy Alluxio pods with the Helm chart
 
-With the helm values yaml file configured for Alluxio master nodes and worker nodes (and persistent storage for each), deploy the Alluxio pods using the Helm chart command. Use the command:
+With the helm values yaml file configured for Alluxio master nodes and worker nodes (and persistent storage for each), deploy the Alluxio pods using the Helm chart command. The first time the Alluxio cluster is deployed, you must format the master node journals, so add the --set journal.format.runFormat=true argument to the command. Use the command:
 
-     $ helm install alluxio -f alluxio/alluxio-helm-values.yaml alluxio-charts/alluxio
+     $ helm install alluxio --set journal.format.runFormat=true -f alluxio/alluxio-helm-values.yaml alluxio-charts/alluxio
 
 ### d. Verify the Alluxio cluster deployed successfully
 
@@ -119,19 +119,19 @@ Once all the Alluxio master and worker pods are running, you can verify that the
 
      $ kubectl get pvc
 
-### e. Format the Alluxio master node journal
+### e. Disabel Alluxio master node journal formatting
 
-Before using Alluxio, the master nodes must format their journal storage. The master Pods in the StatefulSet use an initContainer to format the journal on startup. The initContainer is switched on by property: journal.format.runFormat=true. By default, the journal is not formatted when the master starts.
+Since the argument "--set journal.format.runFormat=true" was used to initially deploy the Alluxio cluster, we must upgrade the deployment using the "helm upgrade" command, and specify the "runFormat=false" argument. This way, if a master node gets restarted by the Kubernetes scheduler, it will not format the existing (and still usable) journal on the persistent storage.
 
-Use the following helm upgrade command to format the journals:
+Use the following helm upgrade command to not format the journals:
 
-     $ helm upgrade alluxio -f alluxio/alluxio-helm-values.yaml --set journal.format.runFormat=true alluxio-charts/alluxio
+     $ helm upgrade alluxio --set journal.format.runFormat=false -f alluxio/alluxio-helm-values.yaml alluxio-charts/alluxio
 
 ### f. Run Alluxio CLI commands
 
 You can run Alluxio CLI commands from within the Alluxio master pods. Use the following kubectl command to open a shell session in on e of the Alluxio master pods:
 
-     $ kubectl exec -ti alluxio-master-0 -- /bin/bash
+     $ kubectl exec -ti --container alluxio-master alluxio-master-0 -- /bin/bash
 
 To view the Alluxio properties that were configured for the Alluxio master process, use the command:
 

@@ -113,7 +113,8 @@ properties:
   alluxio.worker.network.netty.worker.threads: 192
   alluxio.worker.jvm.monitor.enabled: true
 
-# Cache storage for the Alluxio workers
+# Alluxio worker node cache storage configuration
+# - Recommend using local NVMe or SSD for cache storage, never network storage
 tieredstore:
   levels:
   - level: 0
@@ -122,7 +123,7 @@ tieredstore:
     path: /mnt/fast-disks/disk0,/mnt/fast-disks/disk1
     type: persistentVolumeClaim
     name: alluxio-nvme0,alluxio-nvme1
-    quota: 548GB,548GB
+    quota: 500GB,500GB
     high: 0.95
     low: 0.7
 
@@ -143,6 +144,10 @@ master:
     requests:
       cpu: "4"
       memory: 36Gi
+  ports:
+    embedded: 19200
+    rpc: 19998
+    web: 19999
   jvmOptions:
     - "-Xms24g"
     - "-Xmx24g"
@@ -180,6 +185,9 @@ worker:
     requests:
       cpu: "8"
       memory: 42Gi
+  ports:
+    rpc: 29999
+    web: 30000
   jvmOptions:
     - "-Xms32g"
     - "-Xmx32g"
@@ -206,14 +214,14 @@ journal:
   ufsType: "local"
   folder: "/journal"
   volumeType: persistentVolumeClaim
-  size: 270Gi
+  size: 250Gi
   storageClass: "fast-disks"
   accessModes:
     - ReadWriteOnce
 
 metastore:
   volumeType: persistentVolumeClaim # Options: "persistentVolumeClaim" or "emptyDir"
-  size: 270Gi
+  size: 250Gi
   mountPath: /metastore
   ## Attributes to use when the metastore is persistentVolumeClaim
   storageClass: "fast-disks"

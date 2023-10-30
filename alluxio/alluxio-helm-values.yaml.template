@@ -181,10 +181,10 @@ worker:
   resources:
     limits:      
       cpu: "8"
-      memory: 42Gi
+      memory: 46Gi
     requests:
       cpu: "8"
-      memory: 42Gi
+      memory: 46Gi
   ports:
     rpc: 29999
     web: 30000

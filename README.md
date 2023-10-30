@@ -65,6 +65,14 @@ See: [Deploy Spark on the EKS cluster](spark/README.md)
 
 TBD
 
+### Step 6. Destroy the EKS cluster
+
+To destroy the EKS cluster (and all the Alluxio and Spark pods running on it), use the following command:
+
+     $ eksctl delete cluster -f eks/eks-cluster.yaml
+
+CAUTION: All persistent volumes will be release and any data on them will be lost.
+
 ---
 
 Please direct questions or comments to greg.palme@alluxio.com

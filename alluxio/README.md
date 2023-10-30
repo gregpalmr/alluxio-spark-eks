@@ -179,6 +179,8 @@ You can destroy the Alluxio master and worker pods and remove the namespace with
 
      $ helm delete --namespace alluxio alluxio
 
+     $ kubectl delete --namespace alluxio -f alluxio/alluxio-worker-pvc.yaml
+
      $ kubectl delete namespace alluxio
 
 ---

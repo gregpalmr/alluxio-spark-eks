@@ -123,9 +123,9 @@ Check to see if the Alluxio master and worker pods are running with the command:
      alluxio-master-0       2/2     Running   0          70s
      alluxio-master-1       2/2     Running   0          70s
      alluxio-master-2       2/2     Running   0          70s
-     alluxio-worker-ktrx7   0/2     Pending   0          70s
-     alluxio-worker-wwp7z   0/2     Pending   0          70s
-     alluxio-worker-x2rkp   0/2     Pending   0          70s
+     alluxio-worker-ktrx7   0/2     Running   0          70s
+     alluxio-worker-wwp7z   0/2     Running   0          70s
+     alluxio-worker-x2rkp   0/2     Running   0          70s
 
 If you see some pods stuck in the Pending status, you can view the log files for the pod to try to understand what might be keeping the pod from successfully running. Use the command:
 
@@ -186,7 +186,7 @@ You can destroy the Alluxio master and worker pods and remove the namespace with
 
      $ helm delete --namespace alluxio alluxio
 
-     $ kubectl delete --namespace alluxio -f alluxio/alluxio-worker-pvc.yaml
+     $ kubectl delete -f alluxio/alluxio-worker-pvc.yaml
 
      $ kubectl delete namespace alluxio
 

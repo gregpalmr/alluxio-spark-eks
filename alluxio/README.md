@@ -104,6 +104,9 @@ Create the Alluxio worker PVCs, using the command:
 The new PVCs will have a status of Pending until the Alluxio worker pods claim them, when the "help install" command is run. View the new PVCs with  the command:
 
      $ kubectl get pvc --namespace alluxio
+     NAME                         STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+     alluxio-cache-worker-nvme0   Bound    local-pv-ab6277fb   549Gi      RWO            fast-disks     4s
+     alluxio-cache-worker-nvme1   Bound    local-pv-4df8005e   549Gi      RWO            fast-disks     4s
 
 ### e. Deploy Alluxio pods with the Helm chart
 

@@ -63,7 +63,7 @@ See: [Deploy Spark on the EKS cluster](spark/README.md)
 
 ### Step 5. Run test Spark jobs against Alluxio
 
-TBD
+See: [Deploy Spark on the EKS Cluster](spark/README.md)
 
 ### Step 6. Destroy the EKS cluster
 
@@ -75,4 +75,4 @@ CAUTION: All persistent volumes will be release and any data on them will be los
 
 ---
 
-Please direct questions or comments to greg.palme@alluxio.com
+Please direct questions or comments to greg.palmer@alluxio.com

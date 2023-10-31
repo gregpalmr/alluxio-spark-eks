@@ -24,7 +24,8 @@ For more information on running Spark on EKS, see: https://aws.amazon.com/blogs/
 
 Follow the instructions in the "Deploy the Spark Operator" section of the AWS blog post: https://aws.amazon.com/blogs/big-data/introducing-amazon-emr-on-eks-job-submission-with-spark-operator-and-spark-submit/
 
-TODO: - Adding the Alluxio client jar file to the Spark classpath.
+TBD: - Adding the Alluxio client jar file to the Spark classpath.
+
 ---
 
 Please direct questions or comments to greg.palmer@alluxio.com

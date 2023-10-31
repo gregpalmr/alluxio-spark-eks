@@ -63,7 +63,7 @@ See: [Deploy Spark on the EKS cluster](spark/README.md)
 
 ### Step 5. Run test Spark jobs against Alluxio
 
-See: [Deploy Spark on the EKS Cluster](spark/README.md)
+See: [Run test Spark jobs against Alluxio](spark/spark-jobs/README.md)
 
 ### Step 6. Destroy the EKS cluster
 

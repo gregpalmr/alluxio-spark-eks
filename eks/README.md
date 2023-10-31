@@ -158,18 +158,18 @@ To see the persistent volumes that were created by the daemon set, use the follo
 
     $ kubectl get pv
         NAME                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE
-        local-pv-36415ad3   274Gi      RWO            Retain           Available           fast-disks              72s
-        local-pv-53231c7c   274Gi      RWO            Retain           Available           fast-disks              72s
-        local-pv-88696f3e   274Gi      RWO            Retain           Available           fast-disks              72s
-        local-pv-94a5a4e4   274Gi      RWO            Retain           Available           fast-disks              72s
-        local-pv-ad10a265   274Gi      RWO            Retain           Available           fast-disks              72s
-        local-pv-adffed3e   274Gi      RWO            Retain           Available           fast-disks              71s
-        local-pv-b359f3ff   274Gi      RWO            Retain           Available           fast-disks              72s
-        local-pv-d68ae837   274Gi      RWO            Retain           Available           fast-disks              72s
-        local-pv-d762717c   274Gi      RWO            Retain           Available           fast-disks              72s
-        local-pv-dce20ffc   274Gi      RWO            Retain           Available           fast-disks              72s
-        local-pv-f654a97c   274Gi      RWO            Retain           Available           fast-disks              71s
-        local-pv-ffc1b84c   274Gi      RWO            Retain           Available           fast-disks              72s
+        local-pv-40f2bb5    274Gi      RWO            Retain           Available           fast-disks              41s
+        local-pv-32acd0e5   274Gi      RWO            Retain           Available           fast-disks              41s
+        local-pv-36e2c318   274Gi      RWO            Retain           Available           fast-disks              41s
+        local-pv-68d1ddd7   274Gi      RWO            Retain           Available           fast-disks              41s
+        local-pv-91349fa8   274Gi      RWO            Retain           Available           fast-disks              41s
+        local-pv-cc50917e   274Gi      RWO            Retain           Available           fast-disks              41s
+        local-pv-45f8cecc   549Gi      RWO            Retain           Available           fast-disks              41s
+        local-pv-553062c6   549Gi      RWO            Retain           Available           fast-disks              41s
+        local-pv-9f839586   549Gi      RWO            Retain           Available           fast-disks              41s
+        local-pv-ae0bb037   549Gi      RWO            Retain           Available           fast-disks              41s
+        local-pv-c205f533   549Gi      RWO            Retain           Available           fast-disks              41s
+        local-pv-c4d9cb37   549Gi      RWO            Retain           Available           fast-disks              41s
 
 ### f. (Optional) Install the Kubernetes Autoscaler
 
@@ -205,13 +205,21 @@ Verify that cluster-autoscaler has started, run the command:
         NAME                                                 READY   STATUS    RESTARTS   AGE
         nodescaler-aws-cluster-autoscaler-7f85d89688-x9lm2   1/1     Running   0          29s
 
+### g. Destroy the EKS cluster
+
+To destroy the EKS cluster (and all the Alluxio and Spark pods running on it), use the following command:
+
+     $ eksctl delete cluster --region us-west-1 --name=emr-spark-alluxio
+
+CAUTION: All persistent volumes will be release and any data on them will be lost.
+
 ### Continue with the next step:
 
 [Deploy Alluxio on the EKS Cluster](../alluxio/README.md)
 
 ---
 
-Please direct questions or comments to greg.palme@alluxio.com
+Please direct questions or comments to greg.palmer@alluxio.com
 
 
 

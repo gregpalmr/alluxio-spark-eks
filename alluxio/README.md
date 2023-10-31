@@ -150,7 +150,7 @@ Once all the Alluxio master and worker pods are running, you can verify that the
 
      $ kubectl get pvc --namespace alluxio
 
-### g. Disabel Alluxio master node journal formatting
+### g. Disable Alluxio master node journal formatting
 
 Since the argument "--set journal.format.runFormat=true" was used to initially deploy the Alluxio cluster, we must upgrade the deployment using the "helm upgrade" command, and specify the "runFormat=false" argument. This way, if a master node gets restarted by the Kubernetes scheduler, it will not format the existing (and still usable) journal on the persistent storage.
 
@@ -186,7 +186,7 @@ You can destroy the Alluxio master and worker pods and remove the namespace with
 
      $ helm delete --namespace alluxio alluxio
 
-     $ kubectl delete -f alluxio/alluxio-worker-pvc.yaml
+     $ kubectl delete --namespace alluxio -f alluxio/alluxio-worker-pvc.yaml
 
      $ kubectl delete namespace alluxio
 

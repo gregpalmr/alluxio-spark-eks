@@ -131,11 +131,25 @@ Use the following helm upgrade command to not format the journals:
 
 ### g. Run Alluxio CLI commands
 
-You can run Alluxio CLI commands from within the Alluxio master pods. Use the following kubectl command to open a shell session in on e of the Alluxio master pods:
+You can start a shell session in a worker node with the command:
+
+     $ kubectl exec -ti --namespace alluxio --container alluxio-worker alluxio-worker-6bwkw -- /bin/bash
+
+And you can view the worker node log files using the commands:
+
+     $ cd /opt/alluxio/logs/
+     $ vi worker.log
+
+You can start a shell session in a master node with the command:
 
      $ kubectl exec -ti --namespace alluxio --container alluxio-master alluxio-master-0 -- /bin/bash
 
-To view the Alluxio properties that were configured for the Alluxio master process, use the command:
+And you can view the master node log files using the commands:
+
+     $ cd /opt/alluxio/logs/
+     $ vi worker.log
+
+In the master node shell, you can view the Alluxio properties that were configured for the Alluxio master process, use the command:
 
      $ ps -ef | grep alluxio
 
@@ -174,12 +188,42 @@ It should show an overview of the cluster, like this:
 You can also view the Alluxio cache storage on each worker node pod by running the command:
 
      $ alluxio fsadmin report capacity
+     Capacity information for all workers:
+         Total Capacity: 3000.00GB
+             Tier: SSD  Size: 3000.00GB
+         Used Capacity: 0B
+             Tier: SSD  Size: 0B
+         Used Percentage: 0%
+         Free Percentage: 100%
+     Worker Name      Last Heartbeat   Storage       SSD              Version          Revision
+     192.168.16.61    0                capacity      1000.00GB        2.9.3            44b59ac84b0bcef9b268a81481d08da96dc27d58
+                                       used          0B (0%)
+     192.168.21.17    0                capacity      1000.00GB        2.9.3            44b59ac84b0bcef9b268a81481d08da96dc27d58
+                                       used          0B (0%)
+     192.168.23.190   0                capacity      1000.00GB        2.9.3            44b59ac84b0bcef9b268a81481d08da96dc27d58
+                                       used          0B (0%)
 
 You can test the integration with the root under file system (UFS) using a built in test utility, like this:
 
      $ alluxio runTests
+     ...
+     runTest --operation BASIC_NON_BYTE_BUFFER --readType NO_CACHE --writeType ASYNC_THROUGH
+     2023-10-31 23:10:37,802 INFO  [main](BasicNonByteBufferOperations.java:93) - writeFile to file /default_tests_files/BASIC_NON_BYTE_BUFFER_NO_CACHE_ASYNC_THROUGH took 17 ms.
+     2023-10-31 23:10:37,807 INFO  [main](BasicNonByteBufferOperations.java:126) - readFile file /default_tests_files/BASIC_NON_BYTE_BUFFER_NO_CACHE_ASYNC_THROUGH took 5 ms.
+     Passed the test!
+
+NOTE: If you see "permission denied" errors when running the tests, you may not have the correct instance IAM roles to allow the Alluxio pods to access your "root" under file system or UFS. You many need to specify the AWS access key id and secret key as specified in step b. above.
+
+View the created test files with the command:
+
+     $ alluxio fs ls /default_tests_files
+
+Remove the test files with the command:
+
+     $ alluxio fs rm -R /default_tests_files
 
 ### h. Destroy the Alluxio cluster
+
 
 You can destroy the Alluxio master and worker pods and remove the namespace with the commands:
 
@@ -189,6 +233,10 @@ You can destroy the Alluxio master and worker pods and remove the namespace with
 
      $ kubectl delete namespace alluxio
 
+### Continue with the next step:
+
+[Deploy Spark on the EKS Cluster](../spark/README.md)
+
 ---
 
-Please direct questions or comments to greg.palme@alluxio.com
+Please direct questions or comments to greg.palmer@alluxio.com

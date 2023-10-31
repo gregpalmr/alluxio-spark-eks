@@ -62,11 +62,11 @@ Modify the yaml file for your Alluxio deployment, by doing the following:
      - Alluxio master node pods:
           -  4 CPU cores
           - 24 GB of Java Heap and 10 GB of direct memory 
-          -  2 300 GB (unformatted) NVMe persistent volumes for cache storage (see: "quota: 270GB,270GB")
+          -  2 300 GB (unformatted) NVMe volumes for metadata storage 
      - Alluxio worker node pods:
           -  8 CPU cores
           - 32 GB of Java Heap and 10 GB of direct memory 
-          -  2 600 GB (unformatted) NVMe persistent volumes for cache storage (see: "quota: 547GB,547GB")
+          -  2 600 GB (unformatted) NVMe volumes for cache storage 
 - If you don't want to install Alluxio on all the EKS nodes, you can define a toleration that will cause Alluxio pods not to get scheduled on specific nodes. Change PUT_YOUR_TOLERATION_KEY_HERE and PUT_YOUR_TOLERATION_VALUE_HERE, and uncomment that section.
 
 Use your favorite editor to modify the Alluxio-helm-values.yaml file:
@@ -79,42 +79,13 @@ To help organize the Kubernetes cluster, create a namespace for your specific en
 
      $ kubectl create namespace alluxio
 
-### d. Create the Alluxio worker persistent volume claims
-
-Alluxio worker pods use NVMe or SSD persistent storage to cache files from the under file systems (UFSs). This helps improve performance for workloads requesting that data and helps reduce cloud storage egress costs and API costs.
-
-Create a persistent volume claims to be used on each EKS node, by the Alluxio worker pods. 
-
-Make a working copy of the alluxio-helm-values.yaml file:
-
-     $ cp alluxio/alluxio-worker-pvc.yaml.template alluxio/alluxio-worker-pvc.yaml
-
-Modify the alluxio-worker-pvc.yaml by doing the following:
-
-- Most users can leave the yaml file as is.
-
-Use your favorite editor to modify the yaml file:
-
-     $ vi alluxio/alluxio-worker-pvc.yaml
-
-Create the Alluxio worker PVCs, using the command:
-
-     $ kubectl apply --namespace alluxio -f alluxio/alluxio-worker-pvc.yaml
-
-The new PVCs will have a status of Pending until the Alluxio worker pods claim them, when the "help install" command is run. View the new PVCs with  the command:
-
-     $ kubectl get pvc --namespace alluxio
-     NAME                         STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-     alluxio-cache-worker-nvme0   Bound    local-pv-ab6277fb   549Gi      RWO            fast-disks     4s
-     alluxio-cache-worker-nvme1   Bound    local-pv-4df8005e   549Gi      RWO            fast-disks     4s
-
-### e. Deploy Alluxio pods with the Helm chart
+### d. Deploy Alluxio pods with the Helm chart
 
 With the helm values yaml file configured for Alluxio master nodes and worker nodes (and persistent storage for each), deploy the Alluxio pods using the Helm chart command. The first time the Alluxio cluster is deployed, you must format the master node journals, so add the --set journal.format.runFormat=true argument to the command. Use the command:
 
      $ helm install alluxio --namespace alluxio --set journal.format.runFormat=true -f alluxio/alluxio-helm-values.yaml alluxio-charts/alluxio
 
-### f. Verify the Alluxio cluster deployed successfully
+### e. Verify the Alluxio cluster deployed successfully
 
 Check to see if the Alluxio master and worker pods are running with the command:
 
@@ -150,7 +121,7 @@ Once all the Alluxio master and worker pods are running, you can verify that the
 
      $ kubectl get pvc --namespace alluxio
 
-### g. Disable Alluxio master node journal formatting
+### f. Disable Alluxio master node journal formatting
 
 Since the argument "--set journal.format.runFormat=true" was used to initially deploy the Alluxio cluster, we must upgrade the deployment using the "helm upgrade" command, and specify the "runFormat=false" argument. This way, if a master node gets restarted by the Kubernetes scheduler, it will not format the existing (and still usable) journal on the persistent storage.
 
@@ -158,7 +129,7 @@ Use the following helm upgrade command to not format the journals:
 
      $ helm upgrade alluxio --namespace alluxio --set journal.format.runFormat=false -f alluxio/alluxio-helm-values.yaml alluxio-charts/alluxio
 
-### h. Run Alluxio CLI commands
+### g. Run Alluxio CLI commands
 
 You can run Alluxio CLI commands from within the Alluxio master pods. Use the following kubectl command to open a shell session in on e of the Alluxio master pods:
 
@@ -176,11 +147,39 @@ You can run the Alluxio CLI command "alluxio fsadmin report" to see an overview 
 
      $ alluxio fsadmin report
 
-You can test the root under file system (UFS) with the built in test:
+It should show an overview of the cluster, like this:
+
+     Alluxio cluster summary:
+         Master Address: alluxio-master-0:19998
+         Web Port: 19999
+         Rpc Port: 19998
+         Started: 10-31-2023 18:49:18:932
+         Uptime: 0 day(s), 0 hour(s), 1 minute(s), and 19 second(s)
+         Version: 2.9.3
+         Safe Mode: false
+         Zookeeper Enabled: false
+         Raft-based Journal: true
+         Raft Journal Addresses:
+             alluxio-master-0:19200
+             alluxio-master-1:19200
+             alluxio-master-2:19200
+         Live Workers: 3
+         Lost Workers: 0
+         Total Capacity: 3000.00GB
+             Tier: SSD  Size: 3000.00GB
+         Used Capacity: 0B
+             Tier: SSD  Size: 0B
+         Free Capacity: 3000.00GB
+
+You can also view the Alluxio cache storage on each worker node pod by running the command:
+
+     $ alluxio fsadmin report capacity
+
+You can test the integration with the root under file system (UFS) using a built in test utility, like this:
 
      $ alluxio runTests
 
-### i. Destroy the Alluxio cluster
+### h. Destroy the Alluxio cluster
 
 You can destroy the Alluxio master and worker pods and remove the namespace with the commands:
 

@@ -97,6 +97,10 @@ Use your favorite editor to modify the yaml file:
 
      $ vi alluxio/alluxio-worker-pvc.yaml
 
+Create the Alluxio worker PVCs, using the command:
+
+     $ kubectl apply --namespace alluxio -f alluxio/alluxio-worker-pvc.yaml
+
 The new PVCs will have a status of Pending until the Alluxio worker pods claim them, when the "help install" command is run. View the new PVCs with  the command:
 
      $ kubectl get pvc --namespace alluxio

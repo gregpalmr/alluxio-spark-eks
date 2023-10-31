@@ -3,7 +3,8 @@ kind: StorageClass
 metadata:
   name: fast-disks
 provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: Immediate
+#volumeBindingMode: Immediate
+volumeBindingMode: WaitForFirstConsumer
 # Supported policies: Delete, Retain
 reclaimPolicy: Retain
 ---

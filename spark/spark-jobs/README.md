@@ -20,7 +20,7 @@ For more information on running Spark on EKS, see: https://aws.amazon.com/blogs/
 
 ## USAGE (con't)
 
-## Step 5. Deploy run test Spark jobs against Alluxio
+## Step 5. Run test Spark jobs against Alluxio
 
 Reference the Alluxio documentation page on running Spark jobs against Alluxio.
 

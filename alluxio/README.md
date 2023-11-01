@@ -147,7 +147,7 @@ You can start a shell session in a master node with the command:
 And you can view the master node log files using the commands:
 
      $ cd /opt/alluxio/logs/
-     $ vi worker.log
+     $ vi master.log
 
 In the master node shell, you can view the Alluxio properties that were configured for the Alluxio master process, use the command:
 

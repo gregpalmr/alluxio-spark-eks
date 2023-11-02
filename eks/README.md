@@ -177,7 +177,7 @@ Cluster Autoscaler is used for automatically adjusting the size of your Kubernet
 
 Make a working copy of the autoscaler-helm-values.yaml file:
 
-     $ cp eks/eks-cluster.yaml.template eks/eks-cluster.yaml
+     $ cp eks/autoscaler-helm-values.yaml.template eks/autoscaler-helm-values.yaml
 
 Modify the yaml file for your deployment, by doing the following:
 
@@ -208,6 +208,8 @@ Verify that cluster-autoscaler has started, run the command:
 ### g. Destroy the EKS cluster
 
 To destroy the EKS cluster (and all the Alluxio and Spark pods running on it), use the following command:
+
+     $ helm delete --namespace kube-system nodescaler
 
      $ eksctl delete cluster --region us-west-1 --name=emr-spark-alluxio
 

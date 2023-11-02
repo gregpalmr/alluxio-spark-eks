@@ -90,9 +90,8 @@ properties:
   alluxio.user.file.persist.on.rename: true
   alluxio.user.file.master.client.threads: 10000
   alluxio.user.file.buffer.bytes: 64MB
-  alluxio.user.block.size.bytes.default: 64MB
   alluxio.user.block.master.client.threads: 10000
-  alluxio.user.block.size.bytes.default: 32MB
+  alluxio.user.block.size.bytes.default: 16MB
   alluxio.user.metrics.collection.enabled: true
   # following properties should be increased if frequent timeouts are observed
   alluxio.user.rpc.retry.max.duration: "2min"

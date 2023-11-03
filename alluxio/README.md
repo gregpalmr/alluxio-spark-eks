@@ -65,7 +65,7 @@ Modify the yaml file for your Alluxio deployment, by doing the following:
      - https://docs.alluxio.io/os/user/stable/en/administration/Performance-Tuning.html
      - https://docs.alluxio.io/os/user/stable/en/administration/Scalability-Tuning.html
      - https://docs.alluxio.io/os/user/stable/en/kubernetes/Running-Alluxio-On-Kubernetes.html?q=JAVA_OPTS
-- The default values in the template file assume that the EKS nodes can provide:
+- For the PROD version of the Helm chart, the default values in the template file assume that the EKS nodes can provide:
      - Alluxio master node pods:
           -  4 CPU cores
           - 24 GB of Java Heap and 10 GB of direct memory 

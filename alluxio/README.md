@@ -40,16 +40,17 @@ Use the helm repo command to add the Alluxio Helm chart to the current repo list
 
 ### b. Configure the Alluxio Helm chart
 
-Create the alluxio-helm-values.yaml file that will be used by the Helm chart to deploy Alluxio on the EKS cluster. There are several things that must be configured including:
-- Persistent storage volumes for the Alluxio master nodes' metadata repository and journal storage.
-- Persistent storage volumes for the Alluxio worker nodes' cache storage.
-- TBD
+Create the Alluxio Helm chart values file that will be used by the Helm chart to deploy Alluxio on the EKS cluster. 
 
 Make a working copy of the alluxio-helm-values.yaml file:
+
+#### DEV
 
 If you are just experimenting with Alluxio and will not be doing performance testing or at-scale testing, you may want to use the "dev" version of the Helm chart values. This version of the Helm values only deploy 1 master node (no master failover) and do not use persistent volumes to store metadata and cache real data. Instead, it uses emptyDir storage type to store metadata and a RAM disk to cache files. Copy the template like this:
 
      $ cp alluxio/alluxio-helm-values-dev.yaml.template alluxio/alluxio-helm-values-dev.yaml
+
+#### PROD
 
 If you are planning on supporting production workloads, then you should use the "prod" version of the Helm values because it deploys 3 master pods with failover, stores master node metadata on persistent volumes and stores cached data on persistent volumes. Copy the template like this:
      $ cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod.yaml

@@ -47,7 +47,12 @@ Create the alluxio-helm-values.yaml file that will be used by the Helm chart to 
 
 Make a working copy of the alluxio-helm-values.yaml file:
 
-     $ cp alluxio/alluxio-helm-values.yaml.template alluxio/alluxio-helm-values.yaml
+If you are just experimenting with Alluxio and will not be doing performance testing or at-scale testing, you may want to use the "dev" version of the Helm chart values. This version of the Helm values only deploy 1 master node (no master failover) and do not use persistent volumes to store metadata and cache real data. Instead, it uses emptyDir storage type to store metadata and a RAM disk to cache files. Copy the template like this:
+
+     $ cp alluxio/alluxio-helm-values-dev.yaml.template alluxio/alluxio-helm-values-dev.yaml
+
+If you are planning on supporting production workloads, then you should use the "prod" version of the Helm values because it deploys 3 master pods with failover, stores master node metadata on persistent volumes and stores cached data on persistent volumes. Copy the template like this:
+     $ cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod.yaml
 
 Modify the yaml file for your Alluxio deployment, by doing the following:
 
@@ -71,7 +76,11 @@ Modify the yaml file for your Alluxio deployment, by doing the following:
 
 Use your favorite editor to modify the Alluxio-helm-values.yaml file:
 
-     $ vi alluxio/alluxio-helm-values.yaml
+     $ vi alluxio/alluxio-helm-values-dev.yaml
+
+or
+
+     $ vi alluxio/alluxio-helm-values-prod.yaml
 
 ### c. Create the alluxio namespace 
 
@@ -83,7 +92,11 @@ To help organize the Kubernetes cluster, create a namespace for your specific en
 
 With the helm values yaml file configured for Alluxio master nodes and worker nodes (and persistent storage for each), deploy the Alluxio pods using the Helm chart command. The first time the Alluxio cluster is deployed, you must format the master node journals, so add the --set journal.format.runFormat=true argument to the command. Use the command:
 
-     $ helm install alluxio --namespace alluxio --set journal.format.runFormat=true -f alluxio/alluxio-helm-values.yaml alluxio-charts/alluxio
+     $ helm install alluxio --namespace alluxio --set journal.format.runFormat=true -f alluxio/alluxio-helm-values-dev.yaml alluxio-charts/alluxio
+
+or
+
+     $ helm install alluxio --namespace alluxio --set journal.format.runFormat=true -f alluxio/alluxio-helm-values-prod.yaml alluxio-charts/alluxio
 
 ### e. Verify the Alluxio cluster deployed successfully
 

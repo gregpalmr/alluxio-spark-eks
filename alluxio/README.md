@@ -53,6 +53,7 @@ If you are just experimenting with Alluxio and will not be doing performance tes
 #### PROD
 
 If you are planning on supporting production workloads, then you should use the "prod" version of the Helm values because it deploys 3 master pods with failover, stores master node metadata on persistent volumes and stores cached data on persistent volumes. Copy the template like this:
+
      $ cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod.yaml
 
 Modify the yaml file for your Alluxio deployment, by doing the following:

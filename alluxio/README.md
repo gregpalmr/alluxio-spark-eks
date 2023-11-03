@@ -146,7 +146,7 @@ Use the following helm upgrade command to not format the journals:
 
      $ helm upgrade alluxio --namespace alluxio --set journal.format.runFormat=false \
           -f alluxio/alluxio-helm-values-dev.yaml alluxio-charts/alluxio
-Or
+or
 
      $ helm upgrade alluxio --namespace alluxio --set journal.format.runFormat=false \
           -f alluxio/alluxio-helm-values-prod.yaml alluxio-charts/alluxio

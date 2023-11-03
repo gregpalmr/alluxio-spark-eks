@@ -94,11 +94,13 @@ To help organize the Kubernetes cluster, create a namespace for your specific en
 
 With the helm values yaml file configured for Alluxio master nodes and worker nodes (and persistent storage for each), deploy the Alluxio pods using the Helm chart command. The first time the Alluxio cluster is deployed, you must format the master node journals, so add the --set journal.format.runFormat=true argument to the command. Use the command:
 
-     $ helm install alluxio --namespace alluxio --set journal.format.runFormat=true -f alluxio/alluxio-helm-values-dev.yaml alluxio-charts/alluxio
+     $ helm install alluxio --namespace alluxio --set journal.format.runFormat=true \
+          -f alluxio/alluxio-helm-values-dev.yaml alluxio-charts/alluxio
 
 or
 
-     $ helm install alluxio --namespace alluxio --set journal.format.runFormat=true -f alluxio/alluxio-helm-values-prod.yaml alluxio-charts/alluxio
+     $ helm install alluxio --namespace alluxio --set journal.format.runFormat=true \
+          -f alluxio/alluxio-helm-values-prod.yaml alluxio-charts/alluxio
 
 ### e. Verify the Alluxio cluster deployed successfully
 
@@ -142,7 +144,12 @@ Since the argument "--set journal.format.runFormat=true" was used to initially d
 
 Use the following helm upgrade command to not format the journals:
 
-     $ helm upgrade alluxio --namespace alluxio --set journal.format.runFormat=false -f alluxio/alluxio-helm-values.yaml alluxio-charts/alluxio
+     $ helm upgrade alluxio --namespace alluxio --set journal.format.runFormat=false \
+          -f alluxio/alluxio-helm-values-prod.yaml alluxio-charts/alluxio
+Or
+
+     $ helm upgrade alluxio --namespace alluxio --set journal.format.runFormat=false \
+          -f alluxio/alluxio-helm-values-prod.yaml alluxio-charts/alluxio
 
 ### g. Run Alluxio CLI commands
 

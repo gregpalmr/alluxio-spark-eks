@@ -45,17 +45,19 @@ imagePullSecrets:
 # Alluxio Common Site Properties
 properties:
 
+  alluxio.master.hostname: alluxio-master-0
+
   # Alluxio master journal properties
-  alluxio.master.journal.type: EMBEDDED
-  alluxio.master.journal.folder: /journal
-  alluxio.master.embedded.journal.addresses: "alluxio-master-0:19200"
+  #alluxio.master.journal.type: EMBEDDED
+  #alluxio.master.journal.folder: /journal
+  #alluxio.master.embedded.journal.addresses: "alluxio-master-0:19200"
 
   # Alluxio master metastore properties
   alluxio.master.metastore: ROCKS
   alluxio.master.metastore.dir: /metastore
 
   # Alluxio master root under file system (UFS) properties - other UFSs can be mounted later
-  alluxio.master.mount.table.root.ufs: "s3a:/PUT_YOUR_S3_BUCKET_NAME_HERE/alluxio_root_ufs/"
+  alluxio.master.mount.table.root.ufs: "s3:/PUT_YOUR_S3_BUCKET_NAME_HERE/alluxio_root_ufs/"
   # If Instance IAM roles are used, you do not need to specify
   # access key ID and secret key. If not, then specify them here:
   #alluxio.master.mount.table.root.option.s3a.accessKeyId: "PUT_YOUR_AWS_ACCESS_KEY_ID_HERE"
@@ -120,18 +122,18 @@ master:
   #    effect: "NoSchedule"
   resources:
     limits:
-      cpu: "2"
-      memory: 6Gi
+      cpu: 1
+      memory: 4Gi
     requests:
-      cpu: "2"
-      memory: 6Gi
+      cpu: 1
+      memory: 4Gi
   ports:
     embedded: 19200
     rpc: 19998
     web: 19999
   jvmOptions:
-    - "-Xms6g"
-    - "-Xmx6g"
+    - "-Xms4g"
+    - "-Xmx4g"
   podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "19999"
@@ -141,13 +143,14 @@ jobMaster:
   properties:
   resources:
     limits:
-      memory: 2Gi
+      cpu: .5
+      memory: 1Gi
     requests:
-      cpu: "2"
-      memory: 2Gi
+      cpu: .5
+      memory: 1Gi
   jvmOptions:
-    - "-Xms2g"
-    - "-Xmx2g"
+    - "-Xms1g"
+    - "-Xmx1g"
 
 worker:
   properties:
@@ -158,17 +161,17 @@ worker:
   #    effect: "NoSchedule"
   resources:
     limits:      
-      cpu: "2"
-      memory: 6Gi
+      cpu: 1
+      memory: 5Gi
     requests:
-      cpu: "2"
-      memory: 6Gi
+      cpu: 1
+      memory: 5Gi
   ports:
     rpc: 29999
     web: 30000
   jvmOptions:
-    - "-Xms6g"
-    - "-Xmx6g"
+    - "-Xms5g"
+    - "-Xmx5g"
   podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "30000"
@@ -191,9 +194,10 @@ jobWorker:
   properties:
   resources:
     limits:      
+      cpu: .5
       memory: 2Gi
     requests:
-      cpu: "1"
+      cpu: .5
       memory: 2Gi
   jvmOptions:
     - "-Xms2g"
@@ -203,7 +207,6 @@ jobWorker:
 journal:
   type: "UFS"
   ufsType: "local"
-  folder: "/journal"
   volumeType: emptyDir
   size: 1Gi
   medium: ""
@@ -252,7 +255,7 @@ logserver:
   resources:
     # The default xmx is 8G
     limits:
-      cpu: "2"
+      cpu: "1"
       memory: 2Gi
     requests:
       cpu: "1"

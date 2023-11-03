@@ -35,9 +35,21 @@ To use the commands outlined in the repo, you will need the following:
 
 - You also need IAM role membership and permissions to create the following objects:
      - AWS S3 Buckets (or already have one available)
-     - EKS clusters (and the various resources that get created)
      - CloudFormation stacks
      - EC2 instance types as specfied in the eks/eks-cluster.yaml file
+     - EKS clusters (and the various resources that get created)
+     - For EKS policies, you may need to add this in-line policy:
+     {
+         "Version": "2012-10-17",
+         "Statement": [
+             {
+                 "Sid": "eksadministrator",
+                 "Effect": "Allow",
+                 "Action": "eks:*",
+                 "Resource": "*"
+             }
+         ]
+     }
 
 ## USAGE
 

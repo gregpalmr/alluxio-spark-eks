@@ -142,7 +142,7 @@ Once all the Alluxio master and worker pods are running, you can verify that the
 
 Alluxio deploys a daemonset that runs an Alluxio REST API and S3 API proxy on every node. This API is designed for Python programs, Go programs and AWS S3 client applications to interact with Alluxio without having to have any client side jar files present. 
 
-To support access to the Alluxio REST API from applications running within the EKS cluster, deploy a Kubernetes service in front of the Alluxio REST/S3 API using the hostname alias "alluxio-proxy". Note that if you would like to access the Alluxio REST API fron outside of the EKS cluster, then you will need to use a load balancer such as Nginx to expose the Alluxio proxy daemonset pods to the enterprise DNS environment.
+To support access to the Alluxio REST API from applications running within the EKS cluster, deploy a Kubernetes service in front of the Alluxio REST/S3 API using the hostname alias "alluxio-proxy". Note that if you would like to access the Alluxio REST API from outside of the EKS cluster, then you will need to use a load balancer such as Nginx to expose the Alluxio proxy daemonset pods to the enterprise DNS environment.
 
 Copy the service template file like this:
 

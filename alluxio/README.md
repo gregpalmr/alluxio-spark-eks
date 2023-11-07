@@ -150,7 +150,7 @@ Copy the service template file like this:
 
 Modify the yaml file for your Alluxio deployment, by doing the following:
 
-     - Replace PUT_YOUR_ALLUXIO_HELM_CLUSTER_NAME_HERE with the name you used when you deployed the Alluxio pods.
+- Replace PUT_YOUR_ALLUXIO_HELM_CLUSTER_NAME_HERE with the name you used when you deployed the Alluxio pods.
 
 The name is the done you specified with the helm command. If you used the helm command "helm install alluxio-dev", then the CLUSTER_NAME would be changed to "alluxio-dev".
 

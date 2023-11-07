@@ -226,6 +226,36 @@ jobWorker:
     - "-Xms8g"
     - "-Xmx8g"
 
+# Deploy the Alluxio proxy for REST API (S3 API too)
+proxy:
+  enabled: true # Enable this to enable the proxy for REST API (S3 API too)
+  env:
+  args:
+    - proxy
+  properties:
+  resources:
+    requests:
+      cpu: "0.5"
+      memory: "1Gi"
+    limits:
+      cpu: "2"
+      memory: "2Gi"
+  ports:
+    web: 39999
+  hostNetwork: false
+  # dnsPolicy will be ClusterFirstWithHostNet if hostNetwork: true
+  # and ClusterFirst if hostNetwork: false
+  # You can specify dnsPolicy here to override this inference
+  # dnsPolicy: ClusterFirst
+  # JVM options specific to proxy containers
+  jvmOptions:
+  nodeSelector: {}
+  tolerations: []
+  podAnnotations: {}
+  # The ServiceAccount provided here will have precedence over
+  # the global `serviceAccount`
+  serviceAccount:
+
 journal:
   type: "EMBEDDED"
   ufsType: "local"

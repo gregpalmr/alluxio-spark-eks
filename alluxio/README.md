@@ -152,6 +152,17 @@ Modify the yaml file for your Alluxio deployment, by doing the following:
 
      - Replace PUT_YOUR_ALLUXIO_HELM_CLUSTER_NAME_HERE with the name you used when you deployed the Alluxio pods using the helm command. If you used the helm command "helm install alluxio-dev", then the CLUSTER_NAME would be changed to "alluxio-dev".
 
+Deploy the service using the command:
+
+     $ kubectl apply --namespace=alluxio -f alluxio/alluxio-rest-api-service.yaml
+
+Very that the service has been deployed and has a cluster wide IP address (the host name is "alluxio-proxy"):
+
+     $ kubectl get services --namespace=alluxio
+     NAME               TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)                                                    
+     alluxio-master-0   ClusterIP   None           <none>        19998/TCP,19999/TCP,20001/TCP,20002/TCP,19200/TCP,20003/TCP  
+     alluxio-proxy      ClusterIP   10.100.54.53   <none>        39999/TCP       
+
 You can test that the alluxio-proxy service is working, by issuing a curl command against the API end point. 
 
 First, open a shell session into the alluxio-master-0 pod:

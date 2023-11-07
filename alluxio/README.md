@@ -138,7 +138,41 @@ Once all the Alluxio master and worker pods are running, you can verify that the
 
      $ kubectl get pvc --namespace alluxio
 
-### f. Disable Alluxio master node journal formatting
+### f. Deploy a service in front of the Alluxio REST API daemonset
+
+Alluxio deploys a daemonset that runs an Alluxio REST API and S3 API proxy on every node. This API is designed for Python programs, Go programs and AWS S3 client applications to interact with Alluxio without having to have any client side jar files present. 
+
+Deploy a Kubernetes service to allow client side applications running within the same EKS cluster to reference the Alluxio REST/S3 API using the hostname alias "alluxio-proxy".
+
+Copy the service template file like this:
+
+     $ cp alluxio/alluxio/alluxio-rest-api-service.yaml.template alluxio/alluxio-rest-api-service.yaml
+
+Modify the yaml file for your Alluxio deployment, by doing the following:
+
+     - Replace PUT_YOUR_ALLUXIO_HELM_CLUSTER_NAME_HERE with the name you used when you deployed the Alluxio pods using the helm command. If you used the helm command "helm install alluxio-dev", then the CLUSTER_NAME would be changed to "alluxio-dev".
+
+You can test that the alluxio-proxy service is working, by issuing a curl command against the API end point. 
+
+First, open a shell session into the alluxio-master-0 pod:
+
+     $ kubectl exec -ti --namespace alluxio --container alluxio-master alluxio-master-0 -- /bin/bash
+
+Then, try to list the Alluxio S3 bucket contents using the curl command (the hostname "alluxio-proxy" is provided by the service)::
+
+     $ curl -i \
+          -H "Authorization: AWS4-HMAC-SHA256 Credential=alluxio/" \
+          -X GET http://alluxio-proxy:39999/api/v1/s3/<bucket folder name>/
+
+Download an Alluxio S3 object to a local file:
+
+     $ curl -i --output ./myfile.parquet \
+          -H "Authorization: AWS4-HMAC-SHA256 Credential=alluxio/" \
+          -X GET http://alluxio-proxy:39999/api/v1/s3/<bucket folder name>/<path to a parquet file>.parquet
+
+     $ ls -al myfile.parquet
+
+### g. Disable Alluxio master node journal formatting
 
 Since the argument "--set journal.format.runFormat=true" was used to initially deploy the Alluxio cluster, we must upgrade the deployment using the "helm upgrade" command, and specify the "runFormat=false" argument. This way, if a master node gets restarted by the Kubernetes scheduler, it will not format the existing (and still usable) journal on the persistent storage.
 
@@ -151,7 +185,7 @@ or
      $ helm upgrade alluxio --namespace alluxio --set journal.format.runFormat=false \
           -f alluxio/alluxio-helm-values-prod.yaml alluxio-charts/alluxio
 
-### g. Run Alluxio CLI commands
+### h. Run Alluxio CLI commands
 
 You can start a shell session in a worker node with the command:
 
@@ -244,8 +278,7 @@ Remove the test files with the command:
 
      $ alluxio fs rm -R /default_tests_files
 
-### h. Destroy the Alluxio cluster
-
+### i. Destroy the Alluxio cluster
 
 You can destroy the Alluxio master and worker pods and remove the namespace with the commands:
 

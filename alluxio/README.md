@@ -152,7 +152,7 @@ Modify the yaml file for your Alluxio deployment, by doing the following:
 
 - Replace PUT_YOUR_ALLUXIO_HELM_CLUSTER_NAME_HERE with the name you used when you deployed the Alluxio pods.
 
-The name is the done you specified with the helm command. If you used the helm command "helm install alluxio-dev", then the CLUSTER_NAME would be changed to "alluxio-dev".
+The name is the one you specified with the helm command. If you used the helm command "helm install alluxio-dev", then the CLUSTER_NAME would be changed to "alluxio-dev".
 
 Deploy the service using the command:
 
@@ -175,15 +175,39 @@ Then, try to list the Alluxio S3 bucket contents using the curl command (the hos
 
      $ curl -i \
           -H "Authorization: AWS4-HMAC-SHA256 Credential=alluxio/" \
-          -X GET http://alluxio-proxy:39999/api/v1/s3/<bucket folder name>/
+          -X GET http://alluxio-proxy:39999/api/v1/s3/<alluxio_s3_mount>/
 
 Download an Alluxio S3 object to a local file:
 
      $ curl -i --output ./myfile.parquet \
           -H "Authorization: AWS4-HMAC-SHA256 Credential=alluxio/" \
-          -X GET http://alluxio-proxy:39999/api/v1/s3/<bucket folder name>/<path to a parquet file>.parquet
+          -X GET http://alluxio-proxy:39999/api/v1/s3/<alluxio_s3_mount>/<path to a parquet file>.parquet
 
      $ ls -al myfile.parquet
+
+Later, we will run Spark jobs that referense the Alluxio S3 REST API using a method similar to this:
+
+     %pyspark
+     from pyspark.sql import SparkSession
+     
+     conf = SparkConf()
+     
+     conf.set("spark.hadoop.fs.s3a.access.key", "alluxio_user")
+     conf.set("spark.hadoop.fs.s3a.secret.key", "NOT NEEDED")
+     conf.set("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+     conf.set("spark.hadoop.fs.s3a.endpoint", "http://alluxio-proxy:39999/api/v1/s3")
+     conf.set("spark.hadoop.fs.s3a.path.style.access", "true")
+     conf.set("spark.hadoop.fs.s3a.connection.ssl.enabled","false")
+     
+     spark = SparkSession.builder \
+         .config(conf=conf) \
+         .appName("Spark") \
+         .getOrCreate()
+
+     # Loads parquet file from Alluxio into RDD Data Frame
+     df = spark.read.parquet("s3a://<alluxio_s3_mount>/<my_data>/")
+     
+     df.printSchema()  
 
 ### g. Disable Alluxio master node journal formatting
 

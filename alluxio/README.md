@@ -52,11 +52,25 @@ If you are just experimenting with Alluxio and will not be doing performance tes
 
 #### PROD
 
-If you are planning on supporting production workloads, then you should use the "prod" version of the Helm values because it deploys 3 master pods with failover, stores master node metadata on persistent volumes and stores cached data on persistent volumes. Copy the template like this:
+If you are planning on supporting production workloads, then you should use one of the two "prod" templates versions of the Helm values because it deploys 3 master pods with failover, stores master node metadata on persistent volumes and stores cached data on persistent volumes.  Copy the template like this:
 
-     $ cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod.yaml
+     $ cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod-large.yaml
 
-Modify the yaml file for your Alluxio deployment, by doing the following:
+If you are using larger EC2 instance types, such as the m5d.8xlarge instance type, then use the alluxio/alluxio-helm-values-prod-large.yaml version of the template.  Copy the template like this:
+
+     $ cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod-large.yaml
+
+If you are using smaller EC2 instance types, such as m5d.4xlarge, then use the alluxio/alluxio-helm-values-prod-small.yaml version of the template.
+
+     $ cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod-small.yaml
+
+Modify the yaml file for your Alluxio deployment. Use your favorite editor to modify the Alluxio-helm-values.yaml file:
+
+     $ vi alluxio/alluxio-helm-values-dev.yaml
+
+or
+
+     $ vi alluxio/alluxio-helm-values-prod.yaml
 
 - (Optional) If you are using the Enterprise Edition of Alluxio, replace PUT_YOUR_LICENSE_BASE64_VALUE_HERE with your BASE64 version of the license key and uncomment the line that begins with "#license:". Use the following command to get the BASE64 version of your license key:
      - $ cat /path/to/license.json | base64 |  tr -d "\n"
@@ -65,24 +79,25 @@ Modify the yaml file for your Alluxio deployment, by doing the following:
      - https://docs.alluxio.io/os/user/stable/en/administration/Performance-Tuning.html
      - https://docs.alluxio.io/os/user/stable/en/administration/Scalability-Tuning.html
      - https://docs.alluxio.io/os/user/stable/en/kubernetes/Running-Alluxio-On-Kubernetes.html?q=JAVA_OPTS
-- For the PROD version of the Helm chart, the default values in the template file assume that the EKS nodes can provide:
+- For the large PROD version of the Helm chart, the default values in the template file assume that the EKS nodes can provide:
      - Alluxio master node pods:
           -  4 CPU cores
           - 24 GB of Java Heap and 10 GB of direct memory 
-          -  2 300 GB (unformatted) NVMe volumes for metadata storage 
+          -  2 250 GB (formatted) NVMe volumes for metadata storage and journal storage
      - Alluxio worker node pods:
           -  8 CPU cores
           - 32 GB of Java Heap and 10 GB of direct memory 
-          -  2 600 GB (unformatted) NVMe volumes for cache storage 
+          -  2 500 GB (formatted) NVMe volumes for cache storage 
+- For the small PROD version of the Helm chart, the default values in the template file assume that the EKS nodes can provide:
+     - Alluxio master node pods:
+          -  4 CPU cores
+          - 24 GB of Java Heap and 10 GB of direct memory 
+          -  2 250 GB (formatted) NVMe volumes for metadata storage and journal storage
+     - Alluxio worker node pods:
+          -  4 CPU cores
+          - 24 GB of Java Heap and 10 GB of direct memory 
+          -  2 250 GB (formatted) NVMe volumes for cache storage 
 - If you don't want to install Alluxio on all the EKS nodes, you can define a toleration that will cause Alluxio pods not to get scheduled on specific nodes. Change PUT_YOUR_TOLERATION_KEY_HERE and PUT_YOUR_TOLERATION_VALUE_HERE, and uncomment that section.
-
-Use your favorite editor to modify the Alluxio-helm-values.yaml file:
-
-     $ vi alluxio/alluxio-helm-values-dev.yaml
-
-or
-
-     $ vi alluxio/alluxio-helm-values-prod.yaml
 
 ### c. Create the alluxio namespace 
 

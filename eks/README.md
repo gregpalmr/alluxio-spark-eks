@@ -26,13 +26,19 @@ For more information on running Spark on EKS, see: https://aws.amazon.com/blogs/
 
 The EKS yaml file is used to deploy the EKS cluster and the Kubernetes nodes that will host the Spark pods and the Alluxio pods. 
 
-Use an EC2 instance type that has enough NVMe storage to allow Alluxio to cache the needed data from the S3 buckets. The m5d.4xlarge instance type has two 300 GB NVMe volumes, the m5d.8xlarge has 2 600 GB NVMe volumes.
+Use an EC2 instance type that has enough NVMe storage to allow Alluxio to cache the needed data from the S3 buckets. For example, the m5d.4xlarge instance type has two 300 GB NVMe volumes, the m5d.8xlarge has 2 600 GB NVMe volumes.
 
-Make a working copy of the eks-cluster.yaml file:
+Make a working copy of the eks-cluster.yaml file that will be used to launch the EKS cluster. If you are deploying an EKS cluster for a PRODUCTION environment, then it is recommended to use the following command to create a PROD oriented EKS cluster with large enough EC2 instances to support an average Alluxio cluster configuration for a production environment, including EC2 types with NVMe storage for Alluxio master node metadata storage and for Alluxio worker node cache storage:
 
-     $ cp eks/eks-cluster.yaml.template eks/eks-cluster.yaml
+     $ cp eks/eks-cluster-prod.yaml.template eks/eks-cluster.yaml
 
-Modify the yaml file for your deployment, by doing the following:
+If you are deploying a simple DEV environment, use the command to deploy a small EKS cluster using just 2 (by default) m5.xlarge instance types:
+
+     $ cp eks/eks-cluster-dev.yaml.template eks/eks-cluster.yaml
+
+Modify the yaml file for your deployment. Use your favorite editor to modify the yaml file:
+
+     $ vi eks/eks-cluster.yaml
 
 - To restrict access to your EKS cluster, replace PUT_YOUR_YOUR_PUBLIC_IP_HERE with your computer's public IP address. On Linux or MacOS, you can run the following command to get your server's public IP address:
      - $ curl ifconfig.me
@@ -40,15 +46,12 @@ Modify the yaml file for your deployment, by doing the following:
 - Add a reference to your private SSH key, 
 - If you want to be able to SSH into the EC2 instances, replace both occurrences PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE with the path to your public ssh key. If you don't have an SSH key pair, you can generate one with the command:
      - $ ssh-keygen -t rsa -N '' -f ./eks_ssh_key <<< y
-- Change the number of nodes in your EKS cluster to support the workloads you are running. For Alluxio, you will require a minimum of 3 master nodes and 3 worker nodes. Change PUT_YOUR_MAX_WORKER_COUNT_HERE to the maximum number of worker nodes and change PUT_YOUR_DESIRED_WORKER_COUNT_HERE to your desired number of worker nodes.
+- Change the managedNodeGroups section to specify the EC2 instanceType configuration. Use m5d.8xlarge to support higher client side loads and larger cache storage requirements and use m5d.4xlarge to support lower client side loads and smaller cache storage requirements. It defaults to using the smaller m5d.4xlarge instance type.
+- Change the number of worker nodes in your EKS cluster to support the workloads you are running. For an Alluxio PROD cluster, you will require a minimum of 3 master nodes and 3 worker nodes. Change PUT_YOUR_MAX_WORKER_COUNT_HERE to the maximum number of worker nodes and change PUT_YOUR_DESIRED_WORKER_COUNT_HERE to your desired number of worker nodes.
 - Change the EC2 instance types for the master nodes and worker nodes. Make sure you choose instance types that have enough cpu vcores, memory and NVMe storage to support running both Spark pods and Alluxio pods and that allow Alluxio to cache enough data on NVMe storage to improve performance. Alluxio requirements and tuning best practives can be found here:
      - https://docs.alluxio.io/os/user/stable/en/deploy/Requirements.html
      - https://docs.alluxio.io/os/user/stable/en/administration/Performance-Tuning.html
      - https://docs.alluxio.io/os/user/stable/en/administration/Scalability-Tuning.html
-
-Use your favorite editor to modify the yaml file:
-
-     $ vi eks/eks-cluster.yaml
 
 ### b. Deploy the EKS cluster
 
@@ -58,18 +61,18 @@ Use the eksctl command line tool to launch the EKS cluster:
         2023-10-27 12:16:56 [ℹ]  creating addon
         2023-10-27 12:17:50 [ℹ]  addon "kube-proxy" active
         2023-10-27 12:17:52 [ℹ]  kubectl command should work with "/Users/greg/.kube/config", try 'kubectl get nodes'
-        2023-10-27 12:17:52 [✔]  EKS cluster "emr-spark-alluxio" in "us-west-1" region is ready
+        2023-10-27 12:17:52 [✔]  EKS cluster "eks-spark-alluxio" in "us-west-1" region is ready
 
 After the eksctl tool reports that the cluster was created, you can display the EKS nodes and other cluster information using the commands:
 
      $ eksctl get clusters --region=us-west-1
         NAME			REGION		EKSCTL CREATED
-        emr-spark-alluxio	us-west-1	True
+        eks-spark-alluxio	us-west-1	True
 
-     $ eksctl get nodegroups --region=us-west-1 --cluster=emr-spark-alluxio
+     $ eksctl get nodegroups --region=us-west-1 --cluster=eks-spark-alluxio
         CLUSTER			NODEGROUP	STATUS	CREATED			MIN SIZE	MAX SIZE	DESIRED CAPACITY	INSTANCE TYPE	IMAGE ID	ASG NAME					TYPE
-        emr-spark-alluxio	master		ACTIVE	2023-10-27T16:13:42Z	3		3		3			m5d.4xlarge	AL2_x86_64	eks-master-1ec5b8f4-d323-5829-a3ed-a47424e3ad70	managed
-        emr-spark-alluxio	worker		ACTIVE	2023-10-27T16:13:38Z	3		3		3			m5d.4xlarge	AL2_x86_64	eks-worker-08c5b8f4-cba5-5b99-ae13-0d53ac57839c	managed
+        eks-spark-alluxio	master		ACTIVE	2023-10-27T16:13:42Z	3		3		3			m5d.4xlarge	AL2_x86_64	eks-master-1ec5b8f4-d323-5829-a3ed-a47424e3ad70	managed
+        eks-spark-alluxio	worker		ACTIVE	2023-10-27T16:13:38Z	3		3		3			m5d.4xlarge	AL2_x86_64	eks-worker-08c5b8f4-cba5-5b99-ae13-0d53ac57839c	managed
 
      $ kubectl get nodes -o wide
         NAME                                           STATUS   ROLES    AGE   VERSION                INTERNAL-IP      EXTERNAL-IP      OS-IMAGE         KERNEL-VERSION                  CONTAINER-RUNTIME
@@ -211,7 +214,7 @@ To destroy the EKS cluster (and all the Alluxio and Spark pods running on it), u
 
      $ helm delete --namespace kube-system nodescaler
 
-     $ eksctl delete cluster --region us-west-1 --name=emr-spark-alluxio
+     $ eksctl delete cluster --region us-west-1 --name=eks-spark-alluxio
 
 CAUTION: All persistent volumes will be release and any data on them will be lost.
 

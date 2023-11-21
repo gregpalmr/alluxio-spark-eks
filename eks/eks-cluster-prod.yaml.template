@@ -2,9 +2,9 @@
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: emr-spark-alluxio
+  name: eks-spark-alluxio
   region: us-west-1 # replace with your region
-  version: "1.25"
+  version: "1.27"
 vpc:
   clusterEndpoints:
     publicAccess: true
@@ -28,12 +28,12 @@ managedNodeGroups:
     #instanceType: m5d.8xlarge # 32 vcores, 128 GB MEM, 2 x 600 NVMe SSD, 10GbE Network
     #### Use m5d.4xlarge to support lower client side loads and smaller cache storage requirements
     instanceType: m5d.4xlarge # 16 vcores, 64 GB MEM, 2 x 300 NVMe SSD, Up to 10GbE Network
-    availabilityZones: ["us-west-1a"]
+    availabilityZones: ["us-west-1a","us-west-1b"]
     volumeSize: 100
     volumeType: gp3
     minSize: 3
-    maxSize: PUT_YOUR_MAX_WORKER_COUNT_HERE # Example: 10
     desiredCapacity: PUT_YOUR_DESIRED_WORKER_COUNT_HERE # Example: 5
+    maxSize: PUT_YOUR_MAX_WORKER_COUNT_HERE # Example: 10
     tags:
       k8s.io/cluster-autoscaler/enabled: "true"
       k8s.io/cluster-autoscaler/eks-nvme: "owned" 

@@ -21,7 +21,7 @@ iam:
       autoScaler: true
     roleName: eksctl-cluster-autoscaler-role
 managedNodeGroups:
-  - name: eks_node
+  - name: eks-nodes
     labels:
       fast-disk-node: "pv-nvme"
     #### Use m5d.8xlarge to support higher client side loads and larger cache storage requirements

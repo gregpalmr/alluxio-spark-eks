@@ -174,7 +174,13 @@ To see the persistent volumes that were created by the daemon set, use the follo
         local-pv-c205f533   549Gi      RWO            Retain           Available           fast-disks              41s
         local-pv-c4d9cb37   549Gi      RWO            Retain           Available           fast-disks              41s
 
-### f. (Optional) Install the Kubernetes Autoscaler
+### f. Create a "standard" storage class
+
+Alluxio can provide "short circuit" reads by sensing when a client workload (such as a Spark executor pod) is running on the same EKS node as the Alluxio worker pod. It senses this using an EKS domain socket PVC which needs to be part of a storage class. Create the standard storage class for the alluxio-worker-domain-socket PVC to use:
+
+     kubectl apply -f eks/standard-storage-class.yaml
+
+### g. (Optional) Install the Kubernetes Autoscaler
 
 Cluster Autoscaler is used for automatically adjusting the size of your Kubernetes cluster based on the current resource demands, optimizing resource utilization and cost.
 

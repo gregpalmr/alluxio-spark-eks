@@ -36,7 +36,7 @@ managedNodeGroups:
       k8s.io/cluster-autoscaler/eks-nvme: "owned" 
     ssh:
       allow: true
-      publicKeyPath: PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE # Exampe: ~/.ssh/my_rsa_key.pub
+      publicKeyPath: PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE # Exampe: ~/.ssh/my_ssh_key.pub
     preBootstrapCommands:
       - |
         # Install NVMe CLI
@@ -81,7 +81,7 @@ managedNodeGroups:
       k8s.io/cluster-autoscaler/eks-nvme: "owned" 
     ssh:
       allow: true
-      publicKeyPath: PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE # Exampe: ~/.ssh/my_rsa_key.pub
+      publicKeyPath: PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE # Exampe: ~/.ssh/my_ssh_key.pub
     preBootstrapCommands:
       - |
         # Install NVMe CLI

@@ -216,9 +216,23 @@ Very that the service has been deployed and has a cluster wide IP address (the h
 
 And you will see the following output:
 
-     NAME               TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)                                                    
-     alluxio-master-0   ClusterIP   None           <none>        19998/TCP,19999/TCP,20001/TCP,20002/TCP,19200/TCP,20003/TCP  
-     alluxio-proxy      ClusterIP   10.100.54.53   <none>        39999/TCP       
+     NAME               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                                                       AGE
+     alluxio-master-0   ClusterIP   None            <none>        19998/TCP,19999/TCP,20001/TCP,20002/TCP,19200/TCP,20003/TCP   7m15s
+     alluxio-master-1   ClusterIP   None            <none>        19998/TCP,19999/TCP,20001/TCP,20002/TCP,19200/TCP,20003/TCP   7m15s
+     alluxio-master-2   ClusterIP   None            <none>        19998/TCP,19999/TCP,20001/TCP,20002/TCP,19200/TCP,20003/TCP   7m15s
+     alluxio-proxy      ClusterIP   10.100.182.67   <none>        39999/TCP
+
+You can see the service's endpoint using the command:
+
+     kubectl get endpoints -n alluxio
+
+Which will show the output as:
+
+     NAME               ENDPOINTS                                                                    AGE
+     alluxio-master-0   192.168.13.206:19998,192.168.13.206:20002,192.168.13.206:19200 + 3 more...   8m23s
+     alluxio-master-1   192.168.11.147:19998,192.168.11.147:20002,192.168.11.147:19200 + 3 more...   8m23s
+     alluxio-master-2   192.168.43.162:19998,192.168.43.162:20002,192.168.43.162:19200 + 3 more...   8m23s
+     alluxio-proxy      192.168.18.102:39999,192.168.21.179:39999,192.168.24.40:39999 + 3 more...    119s
 
 You can test that the alluxio-proxy service is working, by issuing a curl command against the API end point. 
 
@@ -230,13 +244,13 @@ Then, try to list the Alluxio S3 bucket contents using the curl command (the hos
 
      curl -i \
           -H "Authorization: AWS4-HMAC-SHA256 Credential=alluxio/" \
-          -X GET http://alluxio-proxy:39999/api/v1/s3/<alluxio_s3_mount>/
+          -X GET http://alluxio-proxy:39999/api/v1/s3/
 
 Download an Alluxio S3 object to a local file:
 
      curl -i --output ./myfile.parquet \
           -H "Authorization: AWS4-HMAC-SHA256 Credential=alluxio/" \
-          -X GET http://alluxio-proxy:39999/api/v1/s3/<alluxio_s3_mount>/<path to a parquet file>.parquet
+          -X GET http://alluxio-proxy:39999/api/v1/s3/<virtual bucket namepath to a parquet file>.parquet
 
      ls -al myfile.parquet
 
@@ -260,7 +274,7 @@ Later, we will run Spark jobs that referense the Alluxio S3 REST API using a met
          .getOrCreate()
 
      # Loads parquet file from Alluxio into RDD Data Frame
-     df = spark.read.parquet("s3a://<alluxio_s3_mount>/<my_data>/")
+     df = spark.read.parquet("s3a://<virtual bucket name>/<my_data>/")
      
      df.printSchema()  
 

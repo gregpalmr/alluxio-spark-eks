@@ -14,7 +14,7 @@ kind: Service
 metadata:
   name: alluxio-proxy
   labels:
-    app.kubernetes.io/name: PUT_YOUR_ALLUXIO_HELM_CLUSTER_NAME_HERE
+    app.kubernetes.io/name: PUT_YOUR_ALLUXIO_HELM_CLUSTER_NAME_HERE # The name you used on the "helm install" command. Example "alluxio"
     release: alluxio
     role: alluxio-proxy
 spec:

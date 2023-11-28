@@ -249,7 +249,7 @@ proxy:
   serviceAccount:
 
 shortCircuit:
-  enabled: true
+  enabled: false
   policy: uuid
   size: 1Mi
   # volumeType controls the type of shortCircuit volume.

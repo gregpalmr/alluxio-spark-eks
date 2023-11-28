@@ -26,16 +26,16 @@ For more information on running Spark on EKS, see: https://aws.amazon.com/blogs/
 
 Use the helm repo commands to remove any older Alluxio Helm chart repos:
 
-     $ helm repo list
+     helm repo list
      NAME              URL
      alluxio-charts    https://alluxio-charts.storage.googleapis.com/openSource/2.6.2
 
-     $ helm repo rm alluxio-charts
+     helm repo rm alluxio-charts
      "alluxio-charts" has been removed from your repositories
 
 Use the helm repo command to add the Alluxio Helm chart to the current repo list:
 
-     $ helm repo add alluxio-charts https://alluxio-charts.storage.googleapis.com/openSource/2.9.3
+     helm repo add alluxio-charts https://alluxio-charts.storage.googleapis.com/openSource/2.9.3
      "alluxio-charts" has been added to your repositories
 
 ### b. Configure the Alluxio Helm chart
@@ -48,32 +48,30 @@ Make a working copy of the alluxio-helm-values.yaml file:
 
 If you are just experimenting with Alluxio and will not be doing performance testing or at-scale testing, you may want to use the "dev" version of the Helm chart values. This version of the Helm values only deploy 1 master node (no master failover) and do not use persistent volumes to store metadata and cache real data. Instead, it uses emptyDir storage type to store metadata and a RAM disk to cache files. Copy the template like this:
 
-     $ cp alluxio/alluxio-helm-values-dev.yaml.template alluxio/alluxio-helm-values-dev.yaml
+     cp alluxio/alluxio-helm-values-dev.yaml.template alluxio/alluxio-helm-values-dev.yaml
 
 #### PROD
 
-If you are planning on supporting production workloads, then you should use one of the two "prod" templates versions of the Helm values because it deploys 3 master pods with failover, stores master node metadata on persistent volumes and stores cached data on persistent volumes.  Copy the template like this:
-
-     $ cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod-large.yaml
+If you are planning on supporting production workloads, then you should use one of the two "prod" templates versions of the Helm values because it deploys 3 master pods with failover, stores master node metadata on persistent volumes and stores cached data on persistent volumes.
 
 If you are using larger EC2 instance types, such as the m5d.8xlarge instance type, then use the alluxio/alluxio-helm-values-prod-large.yaml version of the template.  Copy the template like this:
 
-     $ cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod-large.yaml
+     cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod-large.yaml
 
 If you are using smaller EC2 instance types, such as m5d.4xlarge, then use the alluxio/alluxio-helm-values-prod-small.yaml version of the template.
 
-     $ cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod-small.yaml
+     cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod-small.yaml
 
 Modify the yaml file for your Alluxio deployment. Use your favorite editor to modify the Alluxio-helm-values.yaml file:
 
-     $ vi alluxio/alluxio-helm-values-dev.yaml
+     vi alluxio/alluxio-helm-values-dev.yaml
 
 or
 
-     $ vi alluxio/alluxio-helm-values-prod.yaml
+     vi alluxio/alluxio-helm-values-prod.yaml
 
 - (Optional) If you are using the Enterprise Edition of Alluxio, replace PUT_YOUR_LICENSE_BASE64_VALUE_HERE with your BASE64 version of the license key and uncomment the line that begins with "#license:". Use the following command to get the BASE64 version of your license key:
-     - $ cat /path/to/license.json | base64 |  tr -d "\n"
+     - cat /path/to/license.json | base64 |  tr -d "\n"
 - Alluxio requires a root under file system (UFS) but you can add other UFSs later. Replace PUT_YOUR_S3_BUCKET_NAME_HERE with the name of an S3 bucket that Alluxio can use as the root UFS. If you do not have instance IAM roles configured, you can specify the accessKeyId and secretKey by changing PUT_YOUR_AWS_ACCESS_KEY_ID_HERE and PUT_YOUR_AWS_SECRET_KEY_HERE. If you do have instance roles configured, keep those commented out.
 - Change the jvmOptions values for the master, worker, job_master, and job_worker pods, as needed. Alluxio provides guidence on tuning the Alluxio master node and worker node JVMs here: 
      - https://docs.alluxio.io/os/user/stable/en/administration/Performance-Tuning.html
@@ -103,25 +101,28 @@ or
 
 To help organize the Kubernetes cluster, create a namespace for your specific environment. Usethis namespace name on the helm and kubectl commands that you use later. Create the namespace with the command:
 
-     $ kubectl create namespace alluxio
+     kubectl create namespace alluxio
 
 ### d. Deploy Alluxio pods with the Helm chart
 
 With the helm values yaml file configured for Alluxio master nodes and worker nodes (and persistent storage for each), deploy the Alluxio pods using the Helm chart command. The first time the Alluxio cluster is deployed, you must format the master node journals, so add the --set journal.format.runFormat=true argument to the command. Use the command:
 
-     $ helm install alluxio --namespace alluxio --set journal.format.runFormat=true \
+     helm install alluxio --namespace alluxio --set journal.format.runFormat=true \
           -f alluxio/alluxio-helm-values-dev.yaml alluxio-charts/alluxio
 
 or
 
-     $ helm install alluxio --namespace alluxio --set journal.format.runFormat=true \
+     helm install alluxio --namespace alluxio --set journal.format.runFormat=true \
           -f alluxio/alluxio-helm-values-prod.yaml alluxio-charts/alluxio
 
 ### e. Verify the Alluxio cluster deployed successfully
 
 Check to see if the Alluxio master and worker pods are running with the command:
 
-     $ kubectl get pods --namespace alluxio
+     kubectl get pods --namespace alluxio
+
+And you will see the following output:
+
      NAME                   READY   STATUS    RESTARTS   AGE
      alluxio-master-0       2/2     Running   0          70s
      alluxio-master-1       2/2     Running   0          70s
@@ -132,7 +133,7 @@ Check to see if the Alluxio master and worker pods are running with the command:
 
 If you see some pods stuck in the Pending status, you can view the log files for the pod to try to understand what might be keeping the pod from successfully running. Use the command:
 
-     $ kubectl describe pod --namespace alluxio alluxio-worker-x2rkp
+     kubectl describe pod --namespace alluxio alluxio-worker-x2rkp
 
 The command will display several screens worth of information about the pod. The master pods are made up of two containers, master, and job_master. The worker pods are made up of two containers, worker and job_worker. The last few lines will usually show why a pod is stuck in Pending mode. Here is an example message.
 
@@ -145,13 +146,13 @@ Based on the message, you may have to tune the configuration of your EKS cluster
 
 You can also get the log entries for a pod, using the command:
 
-     $ kubectl logs --namespace alluxio alluxio-master-0
+     kubectl logs --namespace alluxio alluxio-master-0
      
 Once all the Alluxio master and worker pods are running, you can verify that they have successfully attached the persistent volumes using the commands:
 
-     $ kubectl get pv --namespace alluxio
+     kubectl get pv --namespace alluxio
 
-     $ kubectl get pvc --namespace alluxio
+     kubectl get pvc --namespace alluxio
 
 ### f. Deploy a service in front of the Alluxio REST API daemonset
 
@@ -161,7 +162,7 @@ To support access to the Alluxio REST API from applications running within the E
 
 Copy the service template file like this:
 
-     $ cp alluxio/alluxio/alluxio-rest-api-service.yaml.template alluxio/alluxio-rest-api-service.yaml
+     cp alluxio/alluxio/alluxio-rest-api-service.yaml.template alluxio/alluxio-rest-api-service.yaml
 
 Modify the yaml file for your Alluxio deployment, by doing the following:
 
@@ -171,11 +172,14 @@ The name is the one you specified with the helm command. If you used the helm co
 
 Deploy the service using the command:
 
-     $ kubectl apply --namespace=alluxio -f alluxio/alluxio-rest-api-service.yaml
+     kubectl apply --namespace=alluxio -f alluxio/alluxio-rest-api-service.yaml
 
 Very that the service has been deployed and has a cluster wide IP address (the host name is "alluxio-proxy"):
 
-     $ kubectl get services --namespace=alluxio
+     kubectl get services --namespace=alluxio
+
+And you will see the following output:
+
      NAME               TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)                                                    
      alluxio-master-0   ClusterIP   None           <none>        19998/TCP,19999/TCP,20001/TCP,20002/TCP,19200/TCP,20003/TCP  
      alluxio-proxy      ClusterIP   10.100.54.53   <none>        39999/TCP       
@@ -184,21 +188,21 @@ You can test that the alluxio-proxy service is working, by issuing a curl comman
 
 First, open a shell session into the alluxio-master-0 pod:
 
-     $ kubectl exec -ti --namespace alluxio --container alluxio-master alluxio-master-0 -- /bin/bash
+     kubectl exec -ti --namespace alluxio --container alluxio-master alluxio-master-0 -- /bin/bash
 
 Then, try to list the Alluxio S3 bucket contents using the curl command (the hostname "alluxio-proxy" is provided by the service):
 
-     $ curl -i \
+     curl -i \
           -H "Authorization: AWS4-HMAC-SHA256 Credential=alluxio/" \
           -X GET http://alluxio-proxy:39999/api/v1/s3/<alluxio_s3_mount>/
 
 Download an Alluxio S3 object to a local file:
 
-     $ curl -i --output ./myfile.parquet \
+     curl -i --output ./myfile.parquet \
           -H "Authorization: AWS4-HMAC-SHA256 Credential=alluxio/" \
           -X GET http://alluxio-proxy:39999/api/v1/s3/<alluxio_s3_mount>/<path to a parquet file>.parquet
 
-     $ ls -al myfile.parquet
+     ls -al myfile.parquet
 
 Later, we will run Spark jobs that referense the Alluxio S3 REST API using a method similar to this:
 
@@ -230,36 +234,36 @@ Since the argument "--set journal.format.runFormat=true" was used to initially d
 
 Use the following helm upgrade command to not format the journals:
 
-     $ helm upgrade alluxio --namespace alluxio --set journal.format.runFormat=false \
+     helm upgrade alluxio --namespace alluxio --set journal.format.runFormat=false \
           -f alluxio/alluxio-helm-values-dev.yaml alluxio-charts/alluxio
 or
 
-     $ helm upgrade alluxio --namespace alluxio --set journal.format.runFormat=false \
+     helm upgrade alluxio --namespace alluxio --set journal.format.runFormat=false \
           -f alluxio/alluxio-helm-values-prod.yaml alluxio-charts/alluxio
 
 ### h. Run Alluxio CLI commands
 
 You can start a shell session in a worker node with the command:
 
-     $ kubectl exec -ti --namespace alluxio --container alluxio-worker alluxio-worker-6bwkw -- /bin/bash
+     kubectl exec -ti --namespace alluxio --container alluxio-worker alluxio-worker-6bwkw -- /bin/bash
 
 And you can view the worker node log files using the commands:
 
-     $ cd /opt/alluxio/logs/
-     $ vi worker.log
+     cd /opt/alluxio/logs/
+     vi worker.log
 
 You can start a shell session in a master node with the command:
 
-     $ kubectl exec -ti --namespace alluxio --container alluxio-master alluxio-master-0 -- /bin/bash
+     kubectl exec -ti --namespace alluxio --container alluxio-master alluxio-master-0 -- /bin/bash
 
 And you can view the master node log files using the commands:
 
-     $ cd /opt/alluxio/logs/
-     $ vi master.log
+     cd /opt/alluxio/logs/
+     vi master.log
 
 In the master node shell, you can view the Alluxio properties that were configured for the Alluxio master process, use the command:
 
-     $ ps -ef | grep alluxio
+     ps -ef | grep alluxio
 
 You will see all of the properties that were defined in the Helm chart values.yaml file as -D options to the Java JVM used to run the master process. Like this:
 
@@ -267,7 +271,7 @@ You will see all of the properties that were defined in the Helm chart values.ya
 
 You can run the Alluxio CLI command "alluxio fsadmin report" to see an overview of the Alluxio cluster. Like this:
 
-     $ alluxio fsadmin report
+     alluxio fsadmin report
 
 It should show an overview of the cluster, like this:
 
@@ -295,7 +299,10 @@ It should show an overview of the cluster, like this:
 
 You can also view the Alluxio cache storage on each worker node pod by running the command:
 
-     $ alluxio fsadmin report capacity
+     alluxio fsadmin report capacity
+
+And you will see the following output:
+
      Capacity information for all workers:
          Total Capacity: 3000.00GB
              Tier: SSD  Size: 3000.00GB
@@ -313,7 +320,10 @@ You can also view the Alluxio cache storage on each worker node pod by running t
 
 You can test the integration with the root under file system (UFS) using a built in test utility, like this:
 
-     $ alluxio runTests
+     alluxio runTests
+
+And you will see the following output:
+
      ...
      runTest --operation BASIC_NON_BYTE_BUFFER --readType NO_CACHE --writeType ASYNC_THROUGH
      2023-10-31 23:10:37,802 INFO  [main](BasicNonByteBufferOperations.java:93) - writeFile to file /default_tests_files/BASIC_NON_BYTE_BUFFER_NO_CACHE_ASYNC_THROUGH took 17 ms.
@@ -324,21 +334,21 @@ NOTE: If you see "permission denied" errors when running the tests, you may not 
 
 View the created test files with the command:
 
-     $ alluxio fs ls /default_tests_files
+     alluxio fs ls /default_tests_files
 
 Remove the test files with the command:
 
-     $ alluxio fs rm -R /default_tests_files
+     alluxio fs rm -R /default_tests_files
 
 ### i. Destroy the Alluxio cluster
 
 You can destroy the Alluxio master and worker pods and remove the namespace with the commands:
 
-     $ helm delete --namespace alluxio alluxio
+     helm delete --namespace alluxio alluxio
 
-     $ kubectl delete --namespace alluxio -f alluxio/alluxio-worker-pvc.yaml
+     kubectl delete --namespace alluxio -f alluxio/alluxio-worker-pvc.yaml
 
-     $ kubectl delete namespace alluxio
+     kubectl delete namespace alluxio
 
 ### Continue with the next step:
 

@@ -23,4 +23,4 @@ spec:
   selector:
     role: alluxio-proxy
     release: alluxio
-    app.kubernetes.io/name: PUT_YOUR_ALLUXIO_HELM_CLUSTER_NAME_HERE
+    app.kubernetes.io/name: PUT_YOUR_ALLUXIO_HELM_CLUSTER_NAME_HERE # The name you used on the "helm install" command. Example "alluxio"

@@ -180,7 +180,19 @@ Alluxio can provide "short circuit" reads by sensing when a client workload (suc
 
      kubectl apply -f eks/standard-storage-class.yaml
 
-### g. (Optional) Install the Kubernetes Autoscaler
+### g. Deploy the Kubernetes metric server pod
+
+To use the "kubectl top node" or "kubectl top pod" command, the Kubernetes metrics-server service must be deployed. Deploy it with the command:
+
+     kubectl apply -f eks/metrics-server.yaml
+
+Wait a few minutes for the service to complete the deployment steps and then run the command to test it:
+
+     kubectl top node
+
+     kubectl top pod --all-namespaces
+
+### h. (Optional) Install the Kubernetes Autoscaler
 
 Cluster Autoscaler is used for automatically adjusting the size of your Kubernetes cluster based on the current resource demands, optimizing resource utilization and cost.
 
@@ -214,7 +226,7 @@ Verify that cluster-autoscaler has started, run the command:
         NAME                                                 READY   STATUS    RESTARTS   AGE
         nodescaler-aws-cluster-autoscaler-7f85d89688-x9lm2   1/1     Running   0          29s
 
-### g. Destroy the EKS cluster
+### i. Destroy the EKS cluster
 
 To destroy the EKS cluster (and all the Alluxio and Spark pods running on it), use the following command:
 

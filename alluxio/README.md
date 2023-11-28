@@ -198,7 +198,7 @@ To support access to the Alluxio REST API from applications running within the E
 
 Copy the service template file like this:
 
-     cp alluxio/alluxio/alluxio-rest-api-service.yaml.template alluxio/alluxio-rest-api-service.yaml
+     cp alluxio/alluxio-rest-api-service.yaml.template alluxio/alluxio-rest-api-service.yaml
 
 Modify the yaml file for your Alluxio deployment, by doing the following:
 

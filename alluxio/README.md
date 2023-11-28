@@ -24,18 +24,29 @@ For more information on running Spark on EKS, see: https://aws.amazon.com/blogs/
 
 ### a. Enable the Alluxio Helm chart
 
-Use the helm repo commands to remove any older Alluxio Helm chart repos:
+Use the helm repo commands to remove any older Alluxio Helm chart repos. Run the command:
 
      helm repo list
+
+And you will see the following output:
+
      NAME              URL
      alluxio-charts    https://alluxio-charts.storage.googleapis.com/openSource/2.6.2
 
+Run the command:
+
      helm repo rm alluxio-charts
+
+And you will see the following output:
+
      "alluxio-charts" has been removed from your repositories
 
 Use the helm repo command to add the Alluxio Helm chart to the current repo list:
 
      helm repo add alluxio-charts https://alluxio-charts.storage.googleapis.com/openSource/2.9.3
+
+And you will see the following output:
+
      "alluxio-charts" has been added to your repositories
 
 ### b. Configure the Alluxio Helm chart

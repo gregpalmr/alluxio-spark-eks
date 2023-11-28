@@ -145,19 +145,19 @@ master:
   #    effect: "NoSchedule"
   resources:
     limits:
-      cpu: 8.0
-      memory: 48Gi
+      cpu: 4
+      memory: 18Gi
     requests:
-      cpu: 8.0
-      memory: 48Gi
+      cpu: 4
+      memory: 18Gi
   ports:
     embedded: 19200
     rpc: 19998
     web: 19999
   jvmOptions:
-    - "-Xms38g"
-    - "-Xmx38g"
-    - "-XX:MaxDirectMemorySize=10g"
+    - "-Xms14g"
+    - "-Xmx14g"
+    - "-XX:MaxDirectMemorySize=4g"
   podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "19999"
@@ -167,14 +167,14 @@ jobMaster:
   properties:
   resources:
     limits:
-      cpu: 7
-      memory: 12Gi
+      cpu: 1
+      memory: 6Gi
     requests:
-      cpu: 7
-      memory: 12Gi
+      cpu: 1
+      memory: 6Gi
   jvmOptions:
-    - "-Xms12g"
-    - "-Xmx12g"
+    - "-Xms6g"
+    - "-Xmx6g"
 
 worker:
   properties:
@@ -185,17 +185,17 @@ worker:
   #    effect: "NoSchedule"
   resources:
     limits:      
-      cpu: 16.0
-      memory: 32Gi
+      cpu: 8
+      memory: 20Gi
     requests:
-      cpu: 16.0
-      memory: 32Gi
+      cpu: 8
+      memory: 20Gi
   ports:
     rpc: 29999
     web: 30000
   jvmOptions:
-    - "-Xms28g"
-    - "-Xmx28g"
+    - "-Xms16g"
+    - "-Xmx16g"
     - "-XX:MaxDirectMemorySize=4g"
   podAnnotations:
     prometheus.io/scrape: "true"
@@ -206,14 +206,14 @@ jobWorker:
   properties:
   resources:
     limits:      
-      cpu: 4.0
-      memory: 15Gi
+      cpu: 1
+      memory: 8Gi
     requests:
-      cpu: 4.0
-      memory: 15Gi
+      cpu: 1
+      memory: 8Gi
   jvmOptions:
-    - "-Xms15g"
-    - "-Xmx15g"
+    - "-Xms8g"
+    - "-Xmx8g"
 
 # Deploy the Alluxio proxy for REST API (S3 API too)
 proxy:
@@ -224,14 +224,14 @@ proxy:
   properties:
   resources:
     requests:
-      cpu: 3.0
-      memory: 15Gi
+      cpu: 1
+      memory: 6Gi
     limits:
-      cpu: 3.0
-      memory: 15Gi
+      cpu: 1
+      memory: 6Gi
   jvmOptions:
-    - "-Xms15g"
-    - "-Xmx15g"
+    - "-Xms6g"
+    - "-Xmx6g"
   ports:
     web: 39999
   hostNetwork: false
@@ -318,10 +318,10 @@ logserver:
   resources:
     # The default xmx is 8G
     limits:
-      cpu: "2"
-      memory: 8Gi
+      cpu: 1
+      memory: 6Gi
     requests:
-      cpu: "1"
+      cpu: 1
       memory: 1Gi
   ports:
     logging: 45600

@@ -165,6 +165,31 @@ Once all the Alluxio master and worker pods are running, you can verify that the
 
      kubectl get pvc --namespace alluxio
 
+To see how many CPU cores and how much memory the Alluxio pods are using, you can use the "kubectl top" commands, like this:
+
+     kubectl top pod --namespace  alluxio
+
+The results will look something like this:
+
+     NAME                   CPU(cores)   MEMORY(bytes)
+     alluxio-master-0       9m           847Mi
+     alluxio-master-1       995m         2419Mi
+     alluxio-master-2       30m          1433Mi
+     alluxio-proxy-2fh97    1m           140Mi
+     alluxio-proxy-6df7h    1m           126Mi
+     alluxio-proxy-cprnk    1m           128Mi
+     alluxio-proxy-kg958    1m           146Mi
+     alluxio-proxy-n82gn    1m           126Mi
+     alluxio-proxy-pkjfj    1m           127Mi
+     alluxio-worker-85b8d   7m           992Mi
+     alluxio-worker-8sfh2   7m           933Mi
+     alluxio-worker-hd5bm   11m          915Mi
+     alluxio-worker-lbjjh   6m           958Mi
+     alluxio-worker-tvhck   6m           942Mi
+     alluxio-worker-v6djj   7m           986Mi
+
+Note that the CPU cores are shows as "micro cores", where 1000m would be equal to 1 core and 500m would be equal to .5 core.
+
 ### f. Deploy a service in front of the Alluxio REST API daemonset
 
 Alluxio deploys a daemonset that runs an Alluxio REST API and S3 API proxy on every node. This API is designed for Python programs, Go programs and AWS S3 client applications to interact with Alluxio without having to have any client side jar files present. 

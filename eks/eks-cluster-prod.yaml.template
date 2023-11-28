@@ -32,14 +32,14 @@ managedNodeGroups:
     volumeSize: 100
     volumeType: gp3
     minSize: 3
-    desiredCapacity: PUT_YOUR_DESIRED_WORKER_COUNT_HERE # Example: 5
+    desiredCapacity: PUT_YOUR_DESIRED_WORKER_COUNT_HERE # Example: 6
     maxSize: PUT_YOUR_MAX_WORKER_COUNT_HERE # Example: 10
     tags:
       k8s.io/cluster-autoscaler/enabled: "true"
       k8s.io/cluster-autoscaler/eks-nvme: "owned" 
     ssh:
       allow: true
-      publicKeyPath: PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE # Exampe: ~/.ssh/my_ssh_key.pub
+      publicKeyPath: PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE # Exampe: ./eks_ssh_key.pub
     preBootstrapCommands:
       - |
         # Install NVMe CLI

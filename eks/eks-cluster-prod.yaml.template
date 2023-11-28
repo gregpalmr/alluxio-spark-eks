@@ -4,7 +4,7 @@ kind: ClusterConfig
 metadata:
   name: eks-spark-alluxio
   region: us-west-1 # replace with your region
-  version: "1.27"
+  version: "1.28"
 vpc:
   clusterEndpoints:
     publicAccess: true

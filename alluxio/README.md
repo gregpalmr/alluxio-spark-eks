@@ -67,11 +67,11 @@ If you are planning on supporting production workloads, then you should use one 
 
 If you are using larger EC2 instance types, such as the m5d.8xlarge instance type, then use the alluxio/alluxio-helm-values-prod-large.yaml version of the template.  Copy the template like this:
 
-     cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod-large.yaml
+     cp alluxio/alluxio-helm-values-prod-large.yaml.template alluxio/alluxio-helm-values-prod.yaml
 
 If you are using smaller EC2 instance types, such as m5d.4xlarge, then use the alluxio/alluxio-helm-values-prod-small.yaml version of the template.
 
-     cp alluxio/alluxio-helm-values-prod.yaml.template alluxio/alluxio-helm-values-prod-small.yaml
+     cp alluxio/alluxio-helm-values-prod-small.yaml.template alluxio/alluxio-helm-values-prod.yaml
 
 Modify the yaml file for your Alluxio deployment. Use your favorite editor to modify the Alluxio-helm-values.yaml file:
 

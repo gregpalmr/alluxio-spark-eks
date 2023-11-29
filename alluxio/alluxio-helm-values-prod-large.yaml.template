@@ -63,7 +63,7 @@ properties:
   # access key ID and secret key. If not, then specify them here:
   #alluxio.master.mount.table.root.option.s3a.accessKeyId: "PUT_YOUR_AWS_ACCESS_KEY_ID_HERE"
   #alluxio.master.mount.table.root.option.s3a.secretKey: "PUT_YOUR_AWS_SECRET_KEY_HERE"
-
+  
   # Alluxio master other properties
   alluxio.master.worker.threads.max: 10000
   alluxio.master.persistence.blacklist: ".spark-staging,.hive-staging,_temporary,_SUCCESS,_delta_log,.tmp"
@@ -145,19 +145,19 @@ master:
   #    effect: "NoSchedule"
   resources:
     limits:
-      cpu: 18.0
-      memory: 64Gi
+      cpu: 10
+      memory: 28Gi
     requests:
-      cpu: 18.0
-      memory: 64Gi
+      cpu:  8 
+      memory: 28Gi
   ports:
     embedded: 19200
     rpc: 19998
     web: 19999
   jvmOptions:
-    - "-Xms54g"
-    - "-Xmx54g"
-    - "-XX:MaxDirectMemorySize=10g"
+    - "-Xms22g"
+    - "-Xmx22g"
+    - "-XX:MaxDirectMemorySize=6g"
   podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "19999"
@@ -167,14 +167,14 @@ jobMaster:
   properties:
   resources:
     limits:
-      cpu: 13.0
-      memory: 36Gi
+      cpu: 2
+      memory: 8Gi
     requests:
-      cpu: 13.0
-      memory: 36Gi
+      cpu: 1
+      memory: 8Gi
   jvmOptions:
-    - "-Xms36g"
-    - "-Xmx36g"
+    - "-Xms8g"
+    - "-Xmx8g"
 
 worker:
   properties:
@@ -185,18 +185,18 @@ worker:
   #    effect: "NoSchedule"
   resources:
     limits:      
-      cpu: 18
-      memory: 75Gi
+      cpu: 12
+      memory: 48Gi
     requests:
-      cpu: 18
-      memory: 75Gi
+      cpu: 12
+      memory: 48Gi
   ports:
     rpc: 29999
     web: 30000
   jvmOptions:
-    - "-Xms65g"
-    - "-Xmx65g"
-    - "-XX:MaxDirectMemorySize=10g"
+    - "-Xms43g"
+    - "-Xmx43g"
+    - "-XX:MaxDirectMemorySize=5g"
   podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "30000"
@@ -206,14 +206,14 @@ jobWorker:
   properties:
   resources:
     limits:      
-      cpu: 8.0
-      memory: 16Gi
+      cpu: 2
+      memory: 8Gi
     requests:
-      cpu: 8.0
-      memory: 16Gi
+      cpu: 2
+      memory: 8Gi
   jvmOptions:
-    - "-Xms16g"
-    - "-Xmx16g"
+    - "-Xms8g"
+    - "-Xmx8g"
 
 # Deploy the Alluxio proxy for REST API (S3 API too)
 proxy:

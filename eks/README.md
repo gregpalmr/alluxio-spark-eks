@@ -75,16 +75,20 @@ Which will show the clusters that are running:
         NAME			REGION		EKSCTL CREATED
         eks-spark-alluxio	us-west-1	True
 
+The command:
+
      eksctl get nodegroups --region=us-west-1 --cluster=eks-spark-alluxio
 
-Which will show the node group in this cluster:
+Will show the node group in this cluster:
 
      CLUSTER			NODEGROUP	STATUS	CREATED			MIN SIZE	MAX SIZE	DESIRED CAPACITY	INSTANCE TYPE	IMAGE ID	ASG NAME						TYPE
      eks-spark-alluxio	eks-nodes	ACTIVE	2023-11-29T13:26:16Z	3		6		6			m5d.8xlarge	AL2_x86_64	eks-eks-nodes-88c60da1-1ce8-6e70-b535-28efb29bcfab	managed
 
+The command:
+
      kubectl get nodes -o wide
 
-Which will show the EKS nodes:
+Will show the EKS nodes:
 
      NAME                                           STATUS   ROLES    AGE   VERSION               INTERNAL-IP      EXTERNAL-IP      OS-IMAGE         KERNEL-VERSION                  CONTAINER-RUNTIME
      ip-192-168-12-165.us-west-1.compute.internal   Ready    <none>   47m   v1.27.7-eks-e71965b   192.168.12.165   13.57.250.211    Amazon Linux 2   5.10.198-187.748.amzn2.x86_64   containerd://1.6.19
@@ -94,9 +98,12 @@ Which will show the EKS nodes:
      ip-192-168-47-218.us-west-1.compute.internal   Ready    <none>   46m   v1.27.7-eks-e71965b   192.168.47.218   54.219.235.227   Amazon Linux 2   5.10.198-187.748.amzn2.x86_64   containerd://1.6.19
      ip-192-168-59-162.us-west-1.compute.internal   Ready    <none>   46m   v1.27.7-eks-e71965b   192.168.59.162   54.193.31.32     Amazon Linux 2   5.10.198-187.748.amzn2.x86_64   containerd://1.6.19
 
+
+The command:
+
      kubectl describe node ip-192-168-12-165.us-west-1.compute.internal
 
-Which will show the details on a specific node.
+Will show the details on a specific node.
 
 ### c. Setup a Service Account
 

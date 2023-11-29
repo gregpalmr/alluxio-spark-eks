@@ -186,23 +186,23 @@ To see the persistent volumes that were created by the daemon set, use the follo
 
 Which will show the persistent volumes:
 
-        NAME                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE
-        local-pv-40f2bb5    274Gi      RWO            Retain           Available           fast-disks              41s
-        local-pv-32acd0e5   274Gi      RWO            Retain           Available           fast-disks              41s
-        local-pv-36e2c318   274Gi      RWO            Retain           Available           fast-disks              41s
-        local-pv-68d1ddd7   274Gi      RWO            Retain           Available           fast-disks              41s
-        local-pv-91349fa8   274Gi      RWO            Retain           Available           fast-disks              41s
-        local-pv-cc50917e   274Gi      RWO            Retain           Available           fast-disks              41s
-        local-pv-45f8cecc   549Gi      RWO            Retain           Available           fast-disks              41s
-        local-pv-553062c6   549Gi      RWO            Retain           Available           fast-disks              41s
-        local-pv-9f839586   549Gi      RWO            Retain           Available           fast-disks              41s
-        local-pv-ae0bb037   549Gi      RWO            Retain           Available           fast-disks              41s
-        local-pv-c205f533   549Gi      RWO            Retain           Available           fast-disks              41s
-        local-pv-c4d9cb37   549Gi      RWO            Retain           Available           fast-disks              41s
+     NAME                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE
+     local-pv-14e02fa4   549Gi      RWO            Retain           Available           fast-disks              26s
+     local-pv-1dd99da9   549Gi      RWO            Retain           Available           fast-disks              26s
+     local-pv-2037c929   549Gi      RWO            Retain           Available           fast-disks              26s
+     local-pv-44c8b13a   549Gi      RWO            Retain           Available           fast-disks              26s
+     local-pv-5a6995c0   549Gi      RWO            Retain           Available           fast-disks              26s
+     local-pv-754b5cf7   549Gi      RWO            Retain           Available           fast-disks              26s
+     local-pv-7e2d7998   549Gi      RWO            Retain           Available           fast-disks              26s
+     local-pv-8806a78a   549Gi      RWO            Retain           Available           fast-disks              26s
+     local-pv-99f4e9ae   549Gi      RWO            Retain           Available           fast-disks              26s
+     local-pv-aa2a3a3b   549Gi      RWO            Retain           Available           fast-disks              26s
+     local-pv-d059461b   549Gi      RWO            Retain           Available           fast-disks              26s
+     local-pv-f74ae3fd   549Gi      RWO            Retain           Available           fast-disks              26s
 
 ### f. Create a "standard" storage class
 
-Alluxio can provide "short circuit" reads by sensing when a client workload (such as a Spark executor pod) is running on the same EKS node as the Alluxio worker pod. It senses this using an EKS domain socket PVC which needs to be part of a storage class. Create the standard storage class for the alluxio-worker-domain-socket PVC to use:
+Alluxio can provide "short circuit" reads by sensing when a client workload (such as a Spark executor) is running on the same EKS node as the Alluxio worker pod. It senses this using an EKS domain socket PVC which needs to be part of a storage class. Create the standard storage class for the alluxio-worker-domain-socket PVC to use:
 
      kubectl apply -f eks/standard-storage-class.yaml
 
@@ -216,7 +216,7 @@ Wait a few minutes for the service to complete the deployment steps and then run
 
      kubectl top node
 
-     kubectl top pod --all-namespaces
+Which will show the CPU and memory usage of each EKS node. Note that the CPU cores are shows as "micro cores", where 1000m would be equal to 1 core and 500m would be equal to .5 core.
 
 ### h. (Optional) Install the Kubernetes Autoscaler
 

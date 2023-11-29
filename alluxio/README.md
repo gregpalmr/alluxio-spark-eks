@@ -57,7 +57,7 @@ Make a working copy of the alluxio-helm-values.yaml file:
 
 #### DEV
 
-If you are just experimenting with Alluxio and will not be doing performance testing or at-scale testing, you may want to use the "dev" version of the Helm chart values. This version of the Helm values only deploy 1 master node (no master failover) and do not use persistent volumes to store metadata and cache real data. Instead, it uses emptyDir storage type to store metadata and a RAM disk to cache files. Copy the template like this:
+If you are just experimenting with Alluxio and will not be doing performance testing or at-scale testing, you may want to use the "dev" version of the Helm chart values. This version of the Helm values deploys only 1 master node (no master failover) and does not use persistent volumes to store metadata and cached data. Instead, it uses emptyDir storage type to store metadata and a RAM disk to cache files. Copy the template like this:
 
      cp alluxio/alluxio-helm-values-dev.yaml.template alluxio/alluxio-helm-values-dev.yaml
 
@@ -91,21 +91,21 @@ or
 - For the large PROD version of the Helm chart, the default values in the template file assume that the EKS nodes can provide:
      - Alluxio master node pods:
           -  4 CPU cores
-          - 24 GB of Java Heap and 10 GB of direct memory 
+          - 24 GB of memory
           -  2 250 GB (formatted) NVMe volumes for metadata storage and journal storage
      - Alluxio worker node pods:
           -  8 CPU cores
-          - 32 GB of Java Heap and 10 GB of direct memory 
+          - 32 GB of memory
           -  2 500 GB (formatted) NVMe volumes for cache storage 
 - For the small PROD version of the Helm chart, the default values in the template file assume that the EKS nodes can provide:
-     - Alluxio master node pods:
-          -  4 CPU cores
-          - 24 GB of Java Heap and 10 GB of direct memory 
-          -  2 250 GB (formatted) NVMe volumes for metadata storage and journal storage
+     - Alluxio master node pods (which include the master container and the job_master container):
+          -  6 CPU cores
+          - 24 GB of memory
+          -  2 270 GB (formatted) NVMe volumes for metadata storage and journal storage
      - Alluxio worker node pods:
-          -  4 CPU cores
-          - 24 GB of Java Heap and 10 GB of direct memory 
-          -  2 250 GB (formatted) NVMe volumes for cache storage 
+          -  10 CPU cores
+          - 34 GB of memory
+          -  2 270 GB (formatted) NVMe volumes for cache storage 
 - If you don't want to install Alluxio on all the EKS nodes, you can define a toleration that will cause Alluxio pods not to get scheduled on specific nodes. Change PUT_YOUR_TOLERATION_KEY_HERE and PUT_YOUR_TOLERATION_VALUE_HERE, and uncomment that section.
 
 ### c. Create the alluxio namespace 
@@ -200,11 +200,15 @@ Copy the service template file like this:
 
      cp alluxio/alluxio-rest-api-service.yaml.template alluxio/alluxio-rest-api-service.yaml
 
-Modify the yaml file for your Alluxio deployment, by doing the following:
+Modify the yaml file for your Alluxio deployment:
+
+     vi alluxio/alluxio-rest-api-service.yaml
+
+Do the following:
 
 - Replace PUT_YOUR_ALLUXIO_HELM_CLUSTER_NAME_HERE with the name you used when you deployed the Alluxio pods.
 
-The name is the one you specified with the helm command. If you used the helm command "helm install alluxio-dev", then the CLUSTER_NAME would be changed to "alluxio-dev".
+The name is the one you specified with the helm command. If you used the helm command "helm install alluxio-dev ...", then the CLUSTER_NAME would be changed to "alluxio-dev".
 
 Deploy the service using the command:
 
@@ -240,7 +244,7 @@ First, open a shell session into the alluxio-master-0 pod:
 
      kubectl exec -ti --namespace alluxio --container alluxio-master alluxio-master-0 -- /bin/bash
 
-Then, try to list the Alluxio S3 bucket contents using the curl command (the hostname "alluxio-proxy" is provided by the service):
+Then, list the Alluxio S3 buckets using the curl command: 
 
      curl -i \
           -H "Authorization: AWS4-HMAC-SHA256 Credential=alluxio/" \
@@ -250,7 +254,7 @@ Download an Alluxio S3 object to a local file:
 
      curl -i --output ./myfile.parquet \
           -H "Authorization: AWS4-HMAC-SHA256 Credential=alluxio/" \
-          -X GET http://alluxio-proxy:39999/api/v1/s3/<virtual bucket namepath to a parquet file>.parquet
+          -X GET http://alluxio-proxy:39999/api/v1/s3/<virtual bucket name>/path to a parquet file>.parquet
 
      ls -al myfile.parquet
 
@@ -396,7 +400,11 @@ You can destroy the Alluxio master and worker pods and remove the namespace with
 
      helm delete --namespace alluxio alluxio
 
-     kubectl delete --namespace alluxio -f alluxio/alluxio-worker-pvc.yaml
+Also, remove the alluxio-proxy service with the command:
+
+     kubectl delete service --namespace alluxio alluxio-proxy
+
+Finally, remove the alluxio namespace with the command:
 
      kubectl delete namespace alluxio
 

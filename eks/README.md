@@ -30,22 +30,22 @@ Use an EC2 instance type that has enough NVMe storage to allow Alluxio to cache 
 
 Make a working copy of the eks-cluster.yaml file that will be used to launch the EKS cluster. If you are deploying an EKS cluster for a PRODUCTION environment, then it is recommended to use the following command to create a PROD oriented EKS cluster with large enough EC2 instances to support an average Alluxio cluster configuration for a production environment, including EC2 types with NVMe storage for Alluxio master node metadata storage and for Alluxio worker node cache storage:
 
-     $ cp eks/eks-cluster-prod.yaml.template eks/eks-cluster.yaml
+     eks/eks-cluster-prod.yaml.template eks/eks-cluster.yaml
 
 If you are deploying a simple DEV environment, use the command to deploy a small EKS cluster using just 2 (by default) m5.xlarge instance types:
 
-     $ cp eks/eks-cluster-dev.yaml.template eks/eks-cluster.yaml
+     eks/eks-cluster-dev.yaml.template eks/eks-cluster.yaml
 
 Modify the yaml file for your deployment. Use your favorite editor to modify the yaml file:
 
-     $ vi eks/eks-cluster.yaml
+     eks/eks-cluster.yaml
 
 - To restrict access to your EKS cluster, replace PUT_YOUR_YOUR_PUBLIC_IP_HERE with your computer's public IP address. On Linux or MacOS, you can run the following command to get your server's public IP address:
-     - $ curl ifconfig.me
+     - ifconfig.me
 - Change the references to the AWS region and availability zones. Change us-west-1, us-west-1a and us-west-1b as needed. 
 - Add a reference to your private SSH key, 
 - If you want to be able to SSH into the EC2 instances, replace both occurrences PUT_YOUR_PATH_TO_PUB_SSH_KEY_HERE with the path to your public ssh key. If you don't have an SSH key pair, you can generate one with the command:
-     - $ ssh-keygen -t rsa -N '' -f ./eks_ssh_key <<< y
+     - -keygen -t rsa -N '' -f ./eks_ssh_key <<< y
 - Change the managedNodeGroups section to specify the EC2 instanceType configuration. Use m5d.8xlarge to support higher client side loads and larger cache storage requirements and use m5d.4xlarge to support lower client side loads and smaller cache storage requirements. It defaults to using the smaller m5d.4xlarge instance type.
 - Change the number of worker nodes in your EKS cluster to support the workloads you are running. For an Alluxio PROD cluster, you will require a minimum of 3 master nodes and 3 worker nodes. Change PUT_YOUR_MAX_WORKER_COUNT_HERE to the maximum number of worker nodes and change PUT_YOUR_DESIRED_WORKER_COUNT_HERE to your desired number of worker nodes.
 - Change the EC2 instance types for the master nodes and worker nodes. Make sure you choose instance types that have enough cpu vcores, memory and NVMe storage to support running both Spark pods and Alluxio pods and that allow Alluxio to cache enough data on NVMe storage to improve performance. Alluxio requirements and tuning best practives can be found here:
@@ -57,7 +57,10 @@ Modify the yaml file for your deployment. Use your favorite editor to modify the
 
 Use the eksctl command line tool to launch the EKS cluster:
 
-     $ eksctl create cluster -f eks/eks-cluster.yaml
+     create cluster -f eks/eks-cluster.yaml
+
+When completed, it will show the cluster as ready:
+
         2023-10-27 12:16:56 [ℹ]  creating addon
         2023-10-27 12:17:50 [ℹ]  addon "kube-proxy" active
         2023-10-27 12:17:52 [ℹ]  kubectl command should work with "/Users/greg/.kube/config", try 'kubectl get nodes'
@@ -65,25 +68,35 @@ Use the eksctl command line tool to launch the EKS cluster:
 
 After the eksctl tool reports that the cluster was created, you can display the EKS nodes and other cluster information using the commands:
 
-     $ eksctl get clusters --region=us-west-1
+     eksctl get clusters --region=us-west-1
+
+Which will show the clusters that are running:
+
         NAME			REGION		EKSCTL CREATED
         eks-spark-alluxio	us-west-1	True
 
-     $ eksctl get nodegroups --region=us-west-1 --cluster=eks-spark-alluxio
-        CLUSTER			NODEGROUP	STATUS	CREATED			MIN SIZE	MAX SIZE	DESIRED CAPACITY	INSTANCE TYPE	IMAGE ID	ASG NAME					TYPE
-        eks-spark-alluxio	master		ACTIVE	2023-10-27T16:13:42Z	3		3		3			m5d.4xlarge	AL2_x86_64	eks-master-1ec5b8f4-d323-5829-a3ed-a47424e3ad70	managed
-        eks-spark-alluxio	worker		ACTIVE	2023-10-27T16:13:38Z	3		3		3			m5d.4xlarge	AL2_x86_64	eks-worker-08c5b8f4-cba5-5b99-ae13-0d53ac57839c	managed
+     eksctl get nodegroups --region=us-west-1 --cluster=eks-spark-alluxio
 
-     $ kubectl get nodes -o wide
-        NAME                                           STATUS   ROLES    AGE   VERSION                INTERNAL-IP      EXTERNAL-IP      OS-IMAGE         KERNEL-VERSION                  CONTAINER-RUNTIME
-        ip-192-168-0-54.us-west-1.compute.internal     Ready    <none>   13m   v1.25.13-eks-43840fb   192.168.0.54     13.52.182.115    Amazon Linux 2   5.10.192-183.736.amzn2.x86_64   containerd://1.6.19
-        ip-192-168-1-177.us-west-1.compute.internal    Ready    <none>   14m   v1.25.13-eks-43840fb   192.168.1.177    54.183.71.208    Amazon Linux 2   5.10.192-183.736.amzn2.x86_64   containerd://1.6.19
-        ip-192-168-19-221.us-west-1.compute.internal   Ready    <none>   14m   v1.25.13-eks-43840fb   192.168.19.221   54.241.86.29     Amazon Linux 2   5.10.192-183.736.amzn2.x86_64   containerd://1.6.19
-        ip-192-168-24-236.us-west-1.compute.internal   Ready    <none>   13m   v1.25.13-eks-43840fb   192.168.24.236   13.52.102.101    Amazon Linux 2   5.10.192-183.736.amzn2.x86_64   containerd://1.6.19
-        ip-192-168-27-14.us-west-1.compute.internal    Ready    <none>   14m   v1.25.13-eks-43840fb   192.168.27.14    3.101.144.207    Amazon Linux 2   5.10.192-183.736.amzn2.x86_64   containerd://1.6.19
-        ip-192-168-4-241.us-west-1.compute.internal    Ready    <none>   13m   v1.25.13-eks-43840fb   192.168.4.241    54.183.161.177   Amazon Linux 2   5.10.192-183.736.amzn2.x86_64   containerd://1.6.19
+Which will show the node group in this cluster:
 
-     $ kubectl describe node ip-192-168-0-54.us-west-1.compute.internal
+     CLUSTER			NODEGROUP	STATUS	CREATED			MIN SIZE	MAX SIZE	DESIRED CAPACITY	INSTANCE TYPE	IMAGE ID	ASG NAME						TYPE
+     eks-spark-alluxio	eks-nodes	ACTIVE	2023-11-29T13:26:16Z	3		6		6			m5d.8xlarge	AL2_x86_64	eks-eks-nodes-88c60da1-1ce8-6e70-b535-28efb29bcfab	managed
+
+     kubectl get nodes -o wide
+
+Which will show the EKS nodes:
+
+     NAME                                           STATUS   ROLES    AGE   VERSION               INTERNAL-IP      EXTERNAL-IP      OS-IMAGE         KERNEL-VERSION                  CONTAINER-RUNTIME
+     ip-192-168-12-165.us-west-1.compute.internal   Ready    <none>   47m   v1.27.7-eks-e71965b   192.168.12.165   13.57.250.211    Amazon Linux 2   5.10.198-187.748.amzn2.x86_64   containerd://1.6.19
+     ip-192-168-13-20.us-west-1.compute.internal    Ready    <none>   47m   v1.27.7-eks-e71965b   192.168.13.20    18.144.171.105   Amazon Linux 2   5.10.198-187.748.amzn2.x86_64   containerd://1.6.19
+     ip-192-168-27-196.us-west-1.compute.internal   Ready    <none>   47m   v1.27.7-eks-e71965b   192.168.27.196   54.219.64.54     Amazon Linux 2   5.10.198-187.748.amzn2.x86_64   containerd://1.6.19
+     ip-192-168-43-88.us-west-1.compute.internal    Ready    <none>   47m   v1.27.7-eks-e71965b   192.168.43.88    13.56.193.140    Amazon Linux 2   5.10.198-187.748.amzn2.x86_64   containerd://1.6.19
+     ip-192-168-47-218.us-west-1.compute.internal   Ready    <none>   46m   v1.27.7-eks-e71965b   192.168.47.218   54.219.235.227   Amazon Linux 2   5.10.198-187.748.amzn2.x86_64   containerd://1.6.19
+     ip-192-168-59-162.us-west-1.compute.internal   Ready    <none>   46m   v1.27.7-eks-e71965b   192.168.59.162   54.193.31.32     Amazon Linux 2   5.10.198-187.748.amzn2.x86_64   containerd://1.6.19
+
+     kubectl describe node ip-192-168-12-165.us-west-1.compute.internal
+
+Which will show the details on a specific node.
 
 ### c. Setup a Service Account
 
@@ -91,7 +104,7 @@ The Kerbernetes CSI driver needs permission to issue API calls to the Kubernetes
 
 Make a working copy of the eks/service-account.yaml file:
 
-     $ cp eks/service-account.yaml.template eks/service-account.yaml
+     cp eks/service-account.yaml.template eks/service-account.yaml
 
 Modify the yaml file for your deployment, by doing the following:
 
@@ -99,13 +112,13 @@ Modify the yaml file for your deployment, by doing the following:
 
 Use your favorite editor to modify the yaml file:
 
-     $ vi eks/service-account.yaml
+     vi eks/service-account.yaml
 
 Create the ServiceAccount, ClusterRole, and ClusterRoleBinding
 
 Run the following command to create the ServiceAccount, ClusterRole, and ClusterRoleBinding:
 
-     $ kubectl apply -f eks/service-account.yaml
+     kubectl apply -f eks/service-account.yaml
 
 ### d. Configure the CSI Driver ConfigMap
 
@@ -115,7 +128,7 @@ Kubernetes StorageClass specifies a type of storage available in the cluster. Th
 
 Make a working copy of the eks/config-map.yaml file:
 
-     $ cp eks/config-map.yaml.template eks/config-map.yaml
+     cp eks/config-map.yaml.template eks/config-map.yaml
 
 Modify the yaml file for your deployment, by doing the following:
 
@@ -123,11 +136,11 @@ Modify the yaml file for your deployment, by doing the following:
 
 Use your favorite editor to modify the yaml file:
 
-     $ vi eks/config-map.yaml
+     vi eks/config-map.yaml
 
 Then run the following command to create the StorageClass and ConfigMap.
 
-     $ kubectl apply -f eks/config-map.yaml
+     kubectl apply -f eks/config-map.yaml
 
 ### e. Deploy the CSI Driver as a DaemonSet
 
@@ -135,7 +148,7 @@ The Local Volume Static Provisioner CSI Driver runs on each EKS node needing its
 
 Make a working copy of the eks/csi-driver-daemon-set.yaml file:
 
-     $ cp eks/csi-driver-daemon-set.yaml.template eks/csi-driver-daemon-set.yaml
+     cp eks/csi-driver-daemon-set.yaml.template eks/csi-driver-daemon-set.yaml
 
 Modify the yaml file for your deployment, by doing the following:
 
@@ -143,15 +156,18 @@ Modify the yaml file for your deployment, by doing the following:
 
 Use your favorite editor to modify the yaml file:
 
-     $ vi eks/csi-driver-daemon-set.yaml
+     vi eks/csi-driver-daemon-set.yaml
 
 Then run the following command to create the StorageClass and ConfigMap.
 
-     $ kubectl apply -f eks/csi-driver-daemon-set.yaml
+     kubectl apply -f eks/csi-driver-daemon-set.yaml
 
 To see the daemon set running on each eks node, use the following command:
 
-     $ kubectl get daemonset --namespace=kube-system
+     kubectl get daemonset --namespace=kube-system
+
+Which will show the daemon sets:
+
         NAME                       DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
         aws-node                   6         6         6       6            6           <none>          30m
         kube-proxy                 6         6         6       6            6           <none>          30m
@@ -159,7 +175,10 @@ To see the daemon set running on each eks node, use the following command:
 
 To see the persistent volumes that were created by the daemon set, use the following command:
 
-    $ kubectl get pv
+    kubectl get pv
+
+Which will show the persistent volumes:
+
         NAME                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE
         local-pv-40f2bb5    274Gi      RWO            Retain           Available           fast-disks              41s
         local-pv-32acd0e5   274Gi      RWO            Retain           Available           fast-disks              41s
@@ -198,7 +217,7 @@ Cluster Autoscaler is used for automatically adjusting the size of your Kubernet
 
 Make a working copy of the autoscaler-helm-values.yaml file:
 
-     $ cp eks/autoscaler-helm-values.yaml.template eks/autoscaler-helm-values.yaml
+     cp eks/autoscaler-helm-values.yaml.template eks/autoscaler-helm-values.yaml
 
 Modify the yaml file for your deployment, by doing the following:
 
@@ -207,22 +226,24 @@ Modify the yaml file for your deployment, by doing the following:
 
 Use your favorite editor to modify the autoscaler-helm-values.yaml file:
 
-     $ vi eks/autoscaler-helm-values.yaml
+     vi eks/autoscaler-helm-values.yaml
 
 Then, enable the autoscaler help chart to be used to deploy the autoscaler:
 
-     $ helm repo add autoscaler https://kubernetes.github.io/autoscaler
-        "autoscaler" has been added to your repositories
+     helm repo add autoscaler https://kubernetes.github.io/autoscaler
 
 Finally, deploy the autoscaler using the helm chart:
 
-     $ helm install nodescaler autoscaler/cluster-autoscaler \
+     helm install nodescaler autoscaler/cluster-autoscaler \
           --namespace kube-system \
           --values eks/autoscaler-helm-values.yaml --debug
 
 Verify that cluster-autoscaler has started, run the command:
 
-     $ kubectl --namespace=kube-system get pods -l "app.kubernetes.io/name=aws-cluster-autoscaler,app.kubernetes.io/instance=nodescaler"
+     kubectl --namespace=kube-system get pods -l "app.kubernetes.io/name=aws-cluster-autoscaler,app.kubernetes.io/instance=nodescaler"
+
+Which will show the auto scaler running:
+
         NAME                                                 READY   STATUS    RESTARTS   AGE
         nodescaler-aws-cluster-autoscaler-7f85d89688-x9lm2   1/1     Running   0          29s
 
@@ -230,9 +251,9 @@ Verify that cluster-autoscaler has started, run the command:
 
 To destroy the EKS cluster (and all the Alluxio and Spark pods running on it), use the following command:
 
-     $ helm delete --namespace kube-system nodescaler
+     helm delete --namespace kube-system nodescaler
 
-     $ eksctl delete cluster --region us-west-1 --name=eks-spark-alluxio
+     eksctl delete cluster --region us-west-1 --name=eks-spark-alluxio
 
 CAUTION: All persistent volumes will be release and any data on them will be lost.
 

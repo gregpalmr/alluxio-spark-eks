@@ -88,24 +88,24 @@ or
      - https://docs.alluxio.io/os/user/stable/en/administration/Performance-Tuning.html
      - https://docs.alluxio.io/os/user/stable/en/administration/Scalability-Tuning.html
      - https://docs.alluxio.io/os/user/stable/en/kubernetes/Running-Alluxio-On-Kubernetes.html?q=JAVA_OPTS
-- For the large PROD version of the Helm chart, the default values in the template file assume that the EKS nodes can provide:
+- For the SMALL PROD version of the Helm chart, the default values in the template file assume that the EKS nodes can provide:
      - Alluxio master node pods:
-          -  4 CPU cores
-          - 24 GB of memory
-          -  2 250 GB (formatted) NVMe volumes for metadata storage and journal storage
-     - Alluxio worker node pods:
-          -  8 CPU cores
-          - 32 GB of memory
-          -  2 500 GB (formatted) NVMe volumes for cache storage 
-- For the small PROD version of the Helm chart, the default values in the template file assume that the EKS nodes can provide:
-     - Alluxio master node pods (which include the master container and the job_master container):
           -  6 CPU cores
           - 24 GB of memory
           -  2 270 GB (formatted) NVMe volumes for metadata storage and journal storage
      - Alluxio worker node pods:
-          -  10 CPU cores
+          - 10 CPU cores
           - 34 GB of memory
           -  2 270 GB (formatted) NVMe volumes for cache storage 
+- For the LARGE PROD version of the Helm chart, the default values in the template file assume that the EKS nodes can provide:
+     - Alluxio master node pods (which include the master container and the job_master container):
+          - 12 CPU cores
+          - 36 GB of memory
+          -  2 270 GB (formatted) NVMe volumes for metadata storage and journal storage
+     - Alluxio worker node pods:
+          - 20 CPU cores
+          - 72 GB of memory
+          -  2 549 GB (formatted) NVMe volumes for cache storage 
 - If you don't want to install Alluxio on all the EKS nodes, you can define a toleration that will cause Alluxio pods not to get scheduled on specific nodes. Change PUT_YOUR_TOLERATION_KEY_HERE and PUT_YOUR_TOLERATION_VALUE_HERE, and uncomment that section.
 
 ### c. Create the alluxio namespace 

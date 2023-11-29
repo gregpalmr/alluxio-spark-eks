@@ -138,11 +138,18 @@ And you will see the following output:
      alluxio-master-0       2/2     Running   0          70s
      alluxio-master-1       2/2     Running   0          70s
      alluxio-master-2       2/2     Running   0          70s
+     alluxio-proxy-5x5v7    1/1     Running   0          70s
+     alluxio-proxy-h5249    1/1     Running   0          70s
+     alluxio-proxy-pjnjm    1/1     Running   0          70s
      alluxio-worker-ktrx7   0/2     Running   0          70s
      alluxio-worker-wwp7z   0/2     Running   0          70s
      alluxio-worker-x2rkp   0/2     Running   0          70s
 
-If you see some pods stuck in the Pending status, you can view the log files for the pod to try to understand what might be keeping the pod from successfully running. Use the command:
+If you see some pods stuck in the "Pending" status, you can view the log files for the pod to try to understand what might be keeping the pod from successfully running. Use the commands:
+
+     kubectl describe pod --namespace alluxio alluxio-master-0
+
+or:
 
      kubectl describe pod --namespace alluxio alluxio-worker-x2rkp
 
@@ -396,13 +403,49 @@ Remove the test files with the command:
 
 ### i. Destroy the Alluxio cluster
 
-You can destroy the Alluxio master and worker pods and remove the namespace with the commands:
+Destroy the Alluxio master and worker pods and remove the namespace with the commands:
 
      helm delete --namespace alluxio alluxio
 
-Also, remove the alluxio-proxy service with the command:
+Remove the alluxio-proxy service with the command:
 
      kubectl delete service --namespace alluxio alluxio-proxy
+
+Remove the persistent volume claims with these commands (all data will be lost):
+
+     kubectl get pvc --namespace alluxio
+
+Will show the PVCs:
+
+     NAME                                 STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+     alluxio-journal-alluxio-master-0     Bound    local-pv-1dd99da9   549Gi      RWO            fast-disks     8m21s
+     alluxio-journal-alluxio-master-1     Bound    local-pv-f74ae3fd   549Gi      RWO            fast-disks     48m
+     alluxio-journal-alluxio-master-2     Bound    local-pv-aa2a3a3b   549Gi      RWO            fast-disks     48m
+     alluxio-metastore-alluxio-master-0   Bound    local-pv-99f4e9ae   549Gi      RWO            fast-disks     8m21s
+     alluxio-metastore-alluxio-master-1   Bound    local-pv-44c8b13a   549Gi      RWO            fast-disks     48m
+     alluxio-metastore-alluxio-master-2   Bound    local-pv-5a6995c0   549Gi      RWO            fast-disks     48m
+
+Delete each of the PVCs wit the commands:
+
+     kubectl delete pvc --namespace alluxio alluxio-journal-alluxio-master-0
+     kubectl delete pvc --namespace alluxio alluxio-journal-alluxio-master-1
+     kubectl delete pvc --namespace alluxio alluxio-journal-alluxio-master-2
+     kubectl delete pvc --namespace alluxio alluxio-metastore-alluxio-master-0
+     kubectl delete pvc --namespace alluxio alluxio-metastore-alluxio-master-1
+     kubectl delete pvc --namespace alluxio alluxio-metastore-alluxio-master-2
+
+Then, remove the cliam reference in the persistent volumes:
+
+     kubectl patch pv local-pv-1dd99da9 -p '{"spec":{"claimRef": null}}'
+     kubectl patch pv local-pv-f74ae3fd -p '{"spec":{"claimRef": null}}'
+     kubectl patch pv local-pv-aa2a3a3b -p '{"spec":{"claimRef": null}}'
+     kubectl patch pv local-pv-99f4e9ae -p '{"spec":{"claimRef": null}}'
+     kubectl patch pv local-pv-44c8b13a -p '{"spec":{"claimRef": null}}'
+     kubectl patch pv local-pv-5a6995c0 -p '{"spec":{"claimRef": null}}'
+
+Then, verify the PVs have no claim ref:
+
+     kubectl get pv
 
 Finally, remove the alluxio namespace with the command:
 

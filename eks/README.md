@@ -30,15 +30,15 @@ Use an EC2 instance type that has enough NVMe storage to allow Alluxio to cache 
 
 Make a working copy of the eks-cluster.yaml file that will be used to launch the EKS cluster. If you are deploying an EKS cluster for a PRODUCTION environment, then it is recommended to use the following command to create a PROD oriented EKS cluster with large enough EC2 instances to support an average Alluxio cluster configuration for a production environment, including EC2 types with NVMe storage for Alluxio master node metadata storage and for Alluxio worker node cache storage:
 
-     eks/eks-cluster-prod.yaml.template eks/eks-cluster.yaml
+    cp eks/eks-cluster-prod.yaml.template eks/eks-cluster.yaml
 
 If you are deploying a simple DEV environment, use the command to deploy a small EKS cluster using just 2 (by default) m5.xlarge instance types:
 
-     eks/eks-cluster-dev.yaml.template eks/eks-cluster.yaml
+     cp eks/eks-cluster-dev.yaml.template eks/eks-cluster.yaml
 
 Modify the yaml file for your deployment. Use your favorite editor to modify the yaml file:
 
-     eks/eks-cluster.yaml
+     vi eks/eks-cluster.yaml
 
 - To restrict access to your EKS cluster, replace PUT_YOUR_YOUR_PUBLIC_IP_HERE with your computer's public IP address. On Linux or MacOS, you can run the following command to get your server's public IP address:
      - curl ifconfig.me

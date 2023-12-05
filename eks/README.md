@@ -57,7 +57,7 @@ Modify the yaml file for your deployment. Use your favorite editor to modify the
 
 Use the eksctl command line tool to launch the EKS cluster:
 
-     create cluster -f eks/eks-cluster.yaml
+     eksctl create cluster -f eks/eks-cluster.yaml
 
 When completed, it will show the cluster as ready:
 
